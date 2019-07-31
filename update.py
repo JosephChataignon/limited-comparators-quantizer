@@ -21,14 +21,14 @@ def getAlpha(optimisationIteration,method='linear decrease'):
         alpha = np.exp(-optimisationIteration/10.)
     return alpha
 
-def oneVarInterpolation(hp,pCentroids,pMSE,optimisationIteration,lastMSE,distrib,precisionCheck,structureCheck,var=None):
+def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure,distrib,precisionCheck,structureCheck,var=None):
     '''
         Use interpolation to estimate the optimal value of a randomly chosen
         variable.
     '''
-    # Note: tried applying the function recursively on its local minima, not a good idea 
+    # Note: tried applying the function recursively on its local minima, not a good idea
     #       (lack of precision+infinite time)
-    
+
     if var == None:
         i = np.random.random_integers(0,len(hp)-1)
         j = np.random.random_integers(0,len(hp[0])-1)
@@ -42,7 +42,7 @@ def oneVarInterpolation(hp,pCentroids,pMSE,optimisationIteration,lastMSE,distrib
     for k in [-30.,-20.,-10.,-5.,-2.,-1.5,-1.,-0.75,-0.5,0,0.25,0.5,0.75,1.,1.5,2.,3.,6.,10.,20.,30.,40.,50.]:
         direction = hp; direction[i][j] = var * k
         x.append( var * k )
-        y.append( MSE( direction ,pCentroids ,pMSE , distrib ) )
+        y.append( measure("mse", direction ,pCentroids ,pMeasure , distrib ) )
     #take successive 4 x's to interpolate
     xmins = []#np.zeros(0)
     ymins = []#np.zeros(0)
@@ -55,18 +55,18 @@ def oneVarInterpolation(hp,pCentroids,pMSE,optimisationIteration,lastMSE,distrib
         xmins.append( xnew[np.argmin(ynew)] )
         ymins.append( min(ynew) )
     smallestValues = [ [xmins[l] for l in np.argpartition(ymins,5)[:5]] , [ymins[l] for l in np.argpartition(ymins,5)[:5]] ]
-    smallestValuesMSE = []
+    smallestValuesMeasure = []
     smallDirections = []
     for smallX in smallestValues[0]:
         direction = hp; direction[i][j] = smallX; smallDirections.append(direction)
-        smallestValuesMSE.append( MSE(direction,pCentroids,pMSE*10,distrib) )
-    n = np.argmin( smallestValuesMSE )
-    return smallDirections[n] , smallestValuesMSE[n]
+        smallestValuesMeasure.append( measure("mse",direction,pCentroids,pMeasure*10,distrib) )
+    n = np.argmin( smallestValuesMeasure )
+    return smallDirections[n] , smallestValuesMeasure[n]
     # Visualisation (comment return statement to activate)
     # f3 = interp1d(x, y, kind='cubic')
     # xnew = np.linspace(min(x), max(x), num=500, endpoint=True)
     # ynew = f3(xnew)
-    # plt.figure(), plt.plot(x,y,'o',xnew,ynew,'-', xmins, ymins ,'v', smallestValues[0], smallestValues[1], 'v', smallestValues[0], smallestValuesMSE, 's' ), plt.show()
+    # plt.figure(), plt.plot(x,y,'o',xnew,ynew,'-', xmins, ymins ,'v', smallestValues[0], smallestValues[1], 'v', smallestValues[0], smallestValuesMeasure, 's' ), plt.show()
 # oneVarInterpolation(init(3,2),1000,10000,1,10,'gaussian',False,False)
 
 def directionsVarByVar(hp,numberOfDirections,optimisationIteration,distrib,pCentroids,structureCheck):
@@ -144,10 +144,10 @@ def choseUpdateFunction(updateMethod,iteration):
         else:
             return 'varByVar'
 
-def updateHyperplanes(hp,pCentroids,pMSE,optimisationIteration,lastMSE,updateFunction,distrib,precisionCheck,structureCheck):
+def updateHyperplanes(hp,pCentroids,pMeasure,optimisationIteration,lastMSE,updateFunction,distrib,precisionCheck,structureCheck):
     '''
         Actually update the hyperplanes by selecting the lowest MSE between
-        several directions
+        several directions. Only uses MSE as measure.
     '''
     # generate directions to test
     if updateFunction == 'globalRandom':
@@ -157,27 +157,26 @@ def updateHyperplanes(hp,pCentroids,pMSE,optimisationIteration,lastMSE,updateFun
     elif updateFunction == 'indVarByVar':
         directions = directionsIndVarByVar(hp,10+10*optimisationIteration,optimisationIteration)
     # evaluate MSE
-    directionsMSE = MSEforDirection(directions, pCentroids, pMSE , distrib)
+    directionsMSE = MSEforDirection(directions, pCentroids, pMeasure , distrib)
     # select the lowest MSE configuration
     indexMin = np.argmin(directionsMSE)
-    newMSE = MSE( directions[indexMin] ,pCentroids ,pMSE*2 , distrib )
-    return checkPrecision(hp,pCentroids,pMSE,distrib,directions,precisionCheck,newMSE,lastMSE,indexMin)
+    newMSE = measure("mse", directions[indexMin] ,pCentroids ,pMeasure*2 , distrib )
+    return checkPrecision(hp,pCentroids,pMeasure,distrib,directions,precisionCheck,newMSE,lastMSE,indexMin)
 
-def checkPrecision(hp,pCentroids,pMSE,distrib,directions,precisionCheck,newMSE,lastMSE,indexMin):
+def checkPrecision(hp,pCentroids,pMeasure,distrib,directions,precisionCheck,newMeasure,lastMeasure,indexMin):
     if not precisionCheck:
-        if newMSE > lastMSE :
-            print('Error: new MSE bigger than at previous iteration')
+        if newMeasure > lastMeasure :
+            print('Error: new Distortion bigger than at previous iteration')
             indexMin = 0 # keep previous configuration
-            return (hp,lastMSE)
+            return (hp,lastMeasure)
         else:
-            return (directions[indexMin],newMSE)
+            return (directions[indexMin],newMeasure)
     else:
     #check that new configuration is better than the old one, taking imprecision into account
-        variations = getMaxMSEVariations(hp,pCentroids,pMSE,distrib)
-        if newMSE < lastMSE-variations:
-            return directions[indexMin],newMSE
+        variations = getMaxMeasureVariations(hp,pCentroids,pMeasure,distrib)
+        if newMeasure < lastMeasure-variations:
+            return directions[indexMin],newMeasure
         else:
             print('Not enough precision - going deeper*******************')
-            newHp,newMSE = updateHyperplanes(hp,pCentroids,pMSE*10,optimisationIteration,lastMSE,updateFunction,distrib)
-            return newHp,newMSE
-
+            newHp,newMeasure = updateHyperplanes(hp,pCentroids,pMeasure*10,optimisationIteration,lastMeasure,updateFunction,distrib)
+            return newHp,newMeasure

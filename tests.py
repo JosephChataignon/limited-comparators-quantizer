@@ -47,7 +47,7 @@ def standardTest2D(distrib,nHyperplanes,initNotRandom=False):
         precisionCheck=False,
         structureCheck=True)
     plt.figure(); plt.plot(curve); plt.title(t); plt.show()
-    print('\n',saveHyperplanes)
+    print('\nsaveHyperplanes:\n',saveHyperplanes)
     print('\n',t,'\n')
 standardTest2D('gaussian',3)
 
@@ -55,7 +55,7 @@ standardTest2D('gaussian',3)
 def mseEstimations(numberOfEstimations):
     e=[]
     for k in range(numberOfEstimations):
-        e.append(MSE(hp,1000,10000,'gaussian'))
+        e.append(measure("mse",hp,1000,10000,'gaussian'))
     plt.figure(); plt.plot(e); plt.title('%d mse estimations')%numberOfEstimations; plt.show()
 # mseEstimations(50)
 

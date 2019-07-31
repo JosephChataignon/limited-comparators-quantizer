@@ -14,20 +14,20 @@ def init(nHyperplanes,nDimensions):
     return np.random.normal(0,10,(nHyperplanes,nDimensions+1))
 
 
-def initNotRandom(nHyperplanes, nDimensions, pCentroids, pMSE, nConfigs, distrib):
+def initNotRandom(nHyperplanes, nDimensions, pCentroids, pMeasure, nConfigs, distrib):
     '''
         Initialise hyperplanes by generating nConfigs random configurations and
-        selecting the one with lowest MSE.
+        selecting the one with lowest measure of distortion.
     '''
     for k in range(nConfigs):
         hp = init(nHyperplanes,nDimensions)
-        e = MSE(hp,pCentroids,pMSE,distrib)
+        e = measure("mse",hp,pCentroids,pMeasure,distrib)
         if k == 0:
-            minMSE = e
+            minDistortion = e
             minHp = hp
         else:
-            if minMSE >= e:
-                minMSE = e
+            if minDistortion >= e:
+                minDistortion = e
                 minHp = hp
     return minHp
 
@@ -68,10 +68,10 @@ def centroids(hyperplanes,param,distrib):
 
 
 
-def optimisation(hp,pCentroids,pMSE,pOptimisation,visualisation=[False,False,10],wTitle='',distrib='gaussian',updateMethod='random directions',precisionCheck=False,structureCheck=False):
+def optimisation(hp,pCentroids,pMeasure,pOptimisation,visualisation=[False,False,10],wTitle='',distrib='gaussian',updateMethod='random directions',precisionCheck=False,structureCheck=False):
     '''
         Uses an update function to update the hyperplanes hp, with pCentroids
-            and pMSE as parametersof the functions centroids() and MSE()
+            and pMeasure as parametersof the functions centroids() and measure()
         pOptimisation: number of iterations
         visualisation = [bool visualiseInitial, bool visualiseSteps, int stepsInterval]
         wTitle: the title used for visualisation
@@ -83,11 +83,11 @@ def optimisation(hp,pCentroids,pMSE,pOptimisation,visualisation=[False,False,10]
             config (hyperplanes intersections, regions) is different from the
             previous one.
     '''
-    mseEvolution = [MSE(hp,pCentroids,pMSE,distrib)]; saveHyperplanes = [hp]
+    measureEvolution = [measure("mse",hp,pCentroids,pMeasure,distrib)]; saveHyperplanes = [hp]
 
     if visualisation[0]:
-        visualiseHyperplanes(hp,wTitle+', iteration= %d, error= %f'%(0,mseEvolution[-1]),5,distrib)
-    
+        visualiseHyperplanes(hp,wTitle+', iteration= %d, error= %f'%(0,measureEvolution[-1]),5,distrib)
+
     # optimization steps
     for k in range(1,pOptimisation+1):
 
@@ -99,18 +99,18 @@ def optimisation(hp,pCentroids,pMSE,pOptimisation,visualisation=[False,False,10]
         u = choseUpdateFunction(updateMethod,k)
         if u == 'oneVarInterpolation':
             for i in range(10):
-                hp,newMSE = oneVarInterpolation(hp,pCentroids,pMSE*k,k,mseEvolution[-1],distrib,precisionCheck,structureCheck)
+                hp,newMeasure = oneVarInterpolation(hp,pCentroids,pMeasure*k,k,measureEvolution[-1],distrib,precisionCheck,structureCheck)
         elif u == 'indVarByVar':
             for i in range(10):
-                hp,newMSE = updateHyperplanes(hp,pCentroids,pMSE*k,k,mseEvolution[-1],u,distrib,precisionCheck,structureCheck)
+                hp,newMeasure = updateHyperplanes(hp,pCentroids,pMeasure*k,k,measureEvolution[-1],u,distrib,precisionCheck,structureCheck)
         else:
-            hp,newMSE = updateHyperplanes(hp,pCentroids,pMSE*k,k,mseEvolution[-1],u,distrib,precisionCheck,structureCheck)
+            hp,newMeasure = updateHyperplanes(hp,pCentroids,pMeasure*k,k,measureEvolution[-1],u,distrib,precisionCheck,structureCheck)
 
-        mseEvolution.append(newMSE)
+        measureEvolution.append(newMeasure)
 
         # display result
         if (k % visualisation[2] == 0) and visualisation[1]:
-            visualiseHyperplanes( hp , wTitle+', iteration= %d, error= %f'%(k,mseEvolution[-1]) , 5 , distrib)
-        print('mseEvolution[-1]',mseEvolution[-1])
+            visualiseHyperplanes( hp , wTitle+', iteration= %d, error= %f'%(k,measureEvolution[-1]) , 5 , distrib)
+        print('measureEvolution[-1]',measureEvolution[-1])
 
-    return mseEvolution,saveHyperplanes
+    return measureEvolution,saveHyperplanes

@@ -59,14 +59,14 @@ def getExistingRegions(hyperplanes,param,distrib):
             output.append(r)
     return np.array(output)
 
-def getMaxMSEVariations(hp,pCentroids,pMSE,distrib):
+def getMaxMeasureVariations(hp,pCentroids,pMeasure,distrib):
     '''
-        Returns the maximal variation of the MSE estimation given the parameters
-        minus 50%, as an estimation of MSE function precision
+        Returns the maximal variation of the Distortion measure given the 
+        parameters minus 50%, as an estimation of distortion function.
     '''
     e=[]
     for k in range(40):
-        e.append(MSE(hp,pCentroids,pMSE,distrib))
+        e.append(measure("mse",hp,pCentroids,pMeasure,distrib))
     e = np.array(e)
     e = (e - np.mean(e))**2
     return math.sqrt(np.max(e)) * 0.5
