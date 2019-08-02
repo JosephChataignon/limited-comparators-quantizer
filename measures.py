@@ -3,11 +3,8 @@
 # mesures of distortion
 
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy import integrate
-from scipy.interpolate import interp1d
 
-import core,update,visualization,utils
+import core,utils
 
 
 
@@ -29,33 +26,32 @@ def negEntropy(hyperplanes,pCentroids,pMeasure,distrib):
         generate a big amount of random points following the distribution to
         estimate the probabilities.
     """
-    regionsWithCentroids = centroids(hyperplanes,pCentroids,distrib)
+    regionsWithCentroids = core.centroids(hyperplanes,pCentroids,distrib)
     entropies = np.zeros(len(regionsWithCentroids))
     numberOfPointsUsed = 0
     
     for i in range(pMeasure):
         
         # generate point and find its region
-        x = f(len(hyperplanes[0])-1 , distrib)
-        r = findRegion(x,hyperplanes)
+        x = utils.f(len(hyperplanes[0])-1 , distrib)
+        r = utils.findRegion(x,hyperplanes)
         
         # match region with an already known one
-        regionRegistered = False
         for j in range(len(regionsWithCentroids)):
             if np.all(regionsWithCentroids[j,0] == r):
                 
                 #increase entropies counter
                 entropies[j] += 1
-                regionRegistered = True
                 numberOfPointsUsed += 1
                 break;
-           
+    
     # adjust values and convert to an actual entropy
     entropies /= float(len(x))
     entropies /= float(numberOfPointsUsed)
-    entropies *= np.log2(entropies) 
+    logEntropies = np.log2(entropies) 
+    entropies *= logEntropies
     
-    return -sum(entropies)
+    return sum(entropies)
 
 
 
@@ -70,10 +66,10 @@ def MSE(hyperplanes,pCentroids,pMeasure,distrib):
     """
     error = 0.
     numberOfPointsUsed = 0
-    regionsWithCentroids = centroids(hyperplanes,pCentroids,distrib)
+    regionsWithCentroids = core.centroids(hyperplanes,pCentroids,distrib)
     for i in range(pMeasure):
-        x = f(len(hyperplanes[0])-1 , distrib)
-        r = findRegion(x,hyperplanes)
+        x = utils.f(len(hyperplanes[0])-1 , distrib)
+        r = utils.findRegion(x,hyperplanes)
         regionRegistered = False
         for j in range(len(regionsWithCentroids)):
             if np.all(regionsWithCentroids[j,0] == r):
@@ -81,7 +77,7 @@ def MSE(hyperplanes,pCentroids,pMeasure,distrib):
                 regionRegistered = True
                 break;
         if regionRegistered:
-            error += squareDistance(x,c)
+            error += utils.squareDistance(x,c)
             numberOfPointsUsed += 1
     error /= float(len(x))
     error /= float(numberOfPointsUsed)
@@ -97,12 +93,12 @@ def MSEforDirection(directions, pCentroids, pMeasure, distrib):
     # define regions and centroids
     regionsWithCentroids = []
     for dir in directions:
-        regionsWithCentroids.append(centroids(dir,pCentroids,distrib) )
+        regionsWithCentroids.append(core.centroids(dir,pCentroids,distrib) )
     # calculate error
     for k in range(pMeasure):
-        x = f(len(directions[0][0])-1 , distrib) # pick a random point x
+        x = utils.f(len(directions[0][0])-1 , distrib) # pick a random point x
         for i in range(len(directions)): #for each direction i
-            r = findRegion(x,directions[i])
+            r = utils.findRegion(x,directions[i])
             regionRegistered = False
             for j in range(len(regionsWithCentroids[i])):
                 if np.all(regionsWithCentroids[i][j,0] == r):
@@ -110,7 +106,7 @@ def MSEforDirection(directions, pCentroids, pMeasure, distrib):
                     regionRegistered = True
                     break;
             if regionRegistered:
-                directionsMSE[i] += squareDistance(x,c)
+                directionsMSE[i] += utils.squareDistance(x,c)
                 numberOfPointsUsed[i] += 1.
     directionsMSE /= float(len(x))
     directionsMSE /= numberOfPointsUsed

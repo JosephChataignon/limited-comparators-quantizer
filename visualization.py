@@ -2,7 +2,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-import core,update,utils,measures
+import core,utils
+
+
+
 
 
 def visualiseRegions(hp,iteration,error,nbPoints,width,distrib):
@@ -11,7 +14,7 @@ def visualiseRegions(hp,iteration,error,nbPoints,width,distrib):
         triangles, 2D only
     '''
     plt.figure()
-    c = centroids(hp,1000,distrib)
+    c = core.centroids(hp,1000,distrib)
     regions=[]
     for k in c:
         regions.append(k[0])
@@ -19,7 +22,7 @@ def visualiseRegions(hp,iteration,error,nbPoints,width,distrib):
     for i in range(nbPoints):
         for j in range(nbPoints):
             i2 = float(i)*width/nbPoints-(width/2.) ; j2 = float(j)*width/nbPoints-(width/2.); point = np.array([i2,j2])
-            region = findRegion(point,hp)
+            region = utils.findRegion(point,hp)
             for z in range(len(regions)):
                 if np.all(region==regions[z]):
                     plt.plot(i2,j2,marker='.',color=colors[z])
@@ -42,7 +45,7 @@ def visualiseHyperplanes(hps,windowTitles,width,distrib,numberPlots=1):
             wTitle = windowTitles[k]
             hp = hps[k]
             plt.subplot(int(np.sqrt(numberPlots)),int(np.sqrt(numberPlots))+1,k+1)
-        c = centroids(hp,1000,distrib)
+        c = core.centroids(hp,1000,distrib)
         plt.plot(0,0,marker='o',color='silver') # plot center of the distribution
         if distrib == 'uniform': # plot the limits of the uniform distribution
             plt.plot( [1,1],[-1,1],[-1,1],[-1,-1],[-1,-1],[1,-1],[1,-1],[1,1] , color='silver')

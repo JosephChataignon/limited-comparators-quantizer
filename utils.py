@@ -1,13 +1,9 @@
 # -*- coding: utf-8 -*-
-import math
-import random
-import scipy
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy import integrate
-from scipy.interpolate import interp1d
 
-import core,update,visualization,measures
+import measures as ms
+
+
 
 
 
@@ -66,7 +62,7 @@ def getMaxMeasureVariations(hp,pCentroids,pMeasure,distrib):
     '''
     e=[]
     for k in range(40):
-        e.append(measure("mse",hp,pCentroids,pMeasure,distrib))
+        e.append(ms.measure("mse",hp,pCentroids,pMeasure,distrib))
     e = np.array(e)
     e = (e - np.mean(e))**2
-    return math.sqrt(np.max(e)) * 0.5
+    return np.sqrt(np.max(e)) * 0.5

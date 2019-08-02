@@ -2,7 +2,10 @@
 
 import numpy as np
 
-import update,visualization,utils,measures
+import update,utils
+import visualization as visu
+import measures as ms
+
 
 
 def init(nHyperplanes,nDimensions):
@@ -14,14 +17,14 @@ def init(nHyperplanes,nDimensions):
     return np.random.normal(0,10,(nHyperplanes,nDimensions+1))
 
 
-def initNotRandom(nHyperplanes, nDimensions, pCentroids, pMeasure, nConfigs, distrib):
+def initNotRandom(nHyperplanes, nDimensions, pCentroids, pMeasure, nConfigs, distrib, m):
     '''
         Initialise hyperplanes by generating nConfigs random configurations and
         selecting the one with lowest measure of distortion.
     '''
     for k in range(nConfigs):
         hp = init(nHyperplanes,nDimensions)
-        e = measure("mse",hp,pCentroids,pMeasure,distrib)
+        e = ms.measure(m,hp,pCentroids,pMeasure,distrib)
         if k == 0:
             minDistortion = e
             minHp = hp
@@ -45,8 +48,8 @@ def centroids(hyperplanes,param,distrib):
     output = []
     rpr = [] # realisations per region
     for i in range(param):
-        x = f(len(hyperplanes[0])-1 , distrib)
-        r = findRegion(x,hyperplanes)
+        x = utils.f(len(hyperplanes[0])-1 , distrib)
+        r = utils.findRegion(x,hyperplanes)
         ir = -1 # index of r in the array output
         for j in range(len(output)): # check if r is already registered
             if np.all(output[j][0] == r):
@@ -68,7 +71,7 @@ def centroids(hyperplanes,param,distrib):
 
 
 
-def optimisation(hp,pCentroids,pMeasure,pOptimisation,visualisation=[False,False,10],wTitle='',distrib='gaussian',updateMethod='random directions',precisionCheck=False,structureCheck=False):
+def optimisation(hp,pCentroids,pMeasure,pOptimisation,visualisation=[False,False,10],wTitle='',distrib='gaussian',m='mse',updateMethod='random directions',precisionCheck=False,structureCheck=False):
     '''
         Uses an update function to update the hyperplanes hp, with pCentroids
             and pMeasure as parametersof the functions centroids() and measure()
@@ -83,34 +86,56 @@ def optimisation(hp,pCentroids,pMeasure,pOptimisation,visualisation=[False,False
             config (hyperplanes intersections, regions) is different from the
             previous one.
     '''
-    measureEvolution = [measure("mse",hp,pCentroids,pMeasure,distrib)]; saveHyperplanes = [hp]
-
+    measureEvolution = [ms.measure(m,hp,pCentroids,pMeasure,distrib)]; saveHyperplanes = [hp]
+    
     if visualisation[0]:
-        visualiseHyperplanes(hp,wTitle+', iteration= %d, error= %f'%(0,measureEvolution[-1]),5,distrib)
-
+        visu.visualiseHyperplanes(hp,wTitle+', iteration= %d, error= %f'%(0,measureEvolution[-1]),5,distrib)
+    
     # optimization steps
     for k in range(1,pOptimisation+1):
-
+        
         if np.all(saveHyperplanes[-1] == hp):
             print('identical configurations ***')
         print('optimisation function: iteration',k,'of',pOptimisation)
         saveHyperplanes.append(hp)
-
-        u = choseUpdateFunction(updateMethod,k)
+        
+        u = update.choseUpdateFunction(updateMethod,k)
         if u == 'oneVarInterpolation':
             for i in range(10):
-                hp,newMeasure = oneVarInterpolation(hp,pCentroids,pMeasure*k,k,measureEvolution[-1],distrib,precisionCheck,structureCheck)
+                hp,newMeasure = update.oneVarInterpolation(hp,pCentroids,pMeasure*k,k,
+                                                           measureEvolution[-1],
+                                                           distrib,m,
+                                                           precisionCheck,
+                                                           structureCheck)
         elif u == 'indVarByVar':
-            for i in range(10):
-                hp,newMeasure = updateHyperplanes(hp,pCentroids,pMeasure*k,k,measureEvolution[-1],u,distrib,precisionCheck,structureCheck)
+            for i in range(len(hp)):
+                for j in range(len(hp[i])):
+                    hp,newMeasure = update.updateHyperplanes(hp,pCentroids,pMeasure*k,k,
+                                                             measureEvolution[-1],
+                                                             u,distrib,m,
+                                                             precisionCheck,
+                                                             structureCheck,
+                                                             var=[i,j])
         else:
-            hp,newMeasure = updateHyperplanes(hp,pCentroids,pMeasure*k,k,measureEvolution[-1],u,distrib,precisionCheck,structureCheck)
-
+            hp,newMeasure = update.updateHyperplanes(hp,pCentroids,pMeasure*k,k,
+                                                     measureEvolution[-1],
+                                                     u,distrib,m,
+                                                     precisionCheck,
+                                                     structureCheck)
         measureEvolution.append(newMeasure)
-
+        
         # display result
         if (k % visualisation[2] == 0) and visualisation[1]:
-            visualiseHyperplanes( hp , wTitle+', iteration= %d, error= %f'%(k,measureEvolution[-1]) , 5 , distrib)
+            visu.visualiseHyperplanes( hp , wTitle+', iteration= %d, error= %f'%(k,measureEvolution[-1]) , 5 , distrib)
         print('measureEvolution[-1]',measureEvolution[-1])
-
+        
     return measureEvolution,saveHyperplanes
+
+
+
+
+
+
+
+
+

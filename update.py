@@ -1,13 +1,16 @@
 # -*- coding: utf-8 -*-
-import math
-import random
-import scipy
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import integrate
 from scipy.interpolate import interp1d
 
-import core,visualization,utils,measures
+import core,utils
+import visualization as visu
+import measures as ms
+
+
+
+
 
 # Functions to update the configuration
 
@@ -21,7 +24,7 @@ def getAlpha(optimisationIteration,method='linear decrease'):
         alpha = np.exp(-optimisationIteration/10.)
     return alpha
 
-def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure,distrib,precisionCheck,structureCheck,var=None):
+def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure,distrib,m,precisionCheck,structureCheck,var=None):
     '''
         Use interpolation to estimate the optimal value of a randomly chosen
         variable.
@@ -39,16 +42,18 @@ def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure
         var = var[2]
     x = []
     y = []
-    for k in [-30.,-20.,-10.,-5.,-2.,-1.5,-1.,-0.75,-0.5,0,0.25,0.5,0.75,1.,1.5,2.,3.,6.,10.,20.,30.,40.,50.]:
+    for k in [-30.,-20.,-10.,-5.,-2.,-1.5,-1.,-0.75,-0.5,0.01,0.25,0.5,0.75,1.,1.5,2.,3.,6.,10.,20.,30.,40.,50.]:
         direction = hp; direction[i][j] = var * k
         x.append( var * k )
-        y.append( measure("mse", direction ,pCentroids ,pMeasure , distrib ) )
+        y.append( ms.measure(m, direction ,pCentroids ,pMeasure , distrib ) )
     #take successive 4 x's to interpolate
     xmins = []#np.zeros(0)
     ymins = []#np.zeros(0)
     for k in range(len(x)-3):
         xReduced = x[k:k+4]
         yReduced = y[k:k+4]
+#        print(xReduced)
+#        print(yReduced)
         fApprox = interp1d(xReduced, yReduced, kind='cubic')
         xnew = np.linspace(min(xReduced), max(xReduced), num=100, endpoint=True)
         ynew = fApprox(xnew)
@@ -59,7 +64,7 @@ def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure
     smallDirections = []
     for smallX in smallestValues[0]:
         direction = hp; direction[i][j] = smallX; smallDirections.append(direction)
-        smallestValuesMeasure.append( measure("mse",direction,pCentroids,pMeasure*10,distrib) )
+        smallestValuesMeasure.append( ms.measure(m,direction,pCentroids,pMeasure*10,distrib) )
     n = np.argmin( smallestValuesMeasure )
     return smallDirections[n] , smallestValuesMeasure[n]
     # Visualisation (comment return statement to activate)
@@ -69,13 +74,13 @@ def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure
     # plt.figure(), plt.plot(x,y,'o',xnew,ynew,'-', xmins, ymins ,'v', smallestValues[0], smallestValues[1], 'v', smallestValues[0], smallestValuesMeasure, 's' ), plt.show()
 # oneVarInterpolation(init(3,2),1000,10000,1,10,'gaussian',False,False)
 
-def directionsVarByVar(hp,numberOfDirections,optimisationIteration,distrib,pCentroids,structureCheck):
+def directionsVarByVar(hp,numberOfDirections,optimisationIteration,distrib,m,pCentroids,structureCheck):
     '''
         Update the hyperplanes by looking at each parameter's potential
         improvements individually. 2D only
     '''
     if structureCheck:
-        regionsStructure = getExistingRegions(hp,pCentroids,distrib)
+        regionsStructure = utils.getExistingRegions(hp,pCentroids,distrib)
     alpha = getAlpha(optimisationIteration,'linear decrease')
     directions = [hp]
     for i in range(len(hp)):
@@ -84,7 +89,7 @@ def directionsVarByVar(hp,numberOfDirections,optimisationIteration,distrib,pCent
                 newdirection = hp
                 newdirection[i][j] += np.random.normal(0,alpha)
                 if structureCheck:
-                    if np.all( regionsStructure == getExistingRegions(newdirection,pCentroids,distrib) ):
+                    if np.all( regionsStructure == utils.getExistingRegions(newdirection,pCentroids,distrib) ):
                         directions.append(newdirection)
                 else:
                     directions.append(newdirection)
@@ -92,8 +97,7 @@ def directionsVarByVar(hp,numberOfDirections,optimisationIteration,distrib,pCent
 
 def directionsGlobalRandom(hp,numberOfDirections,optimisationIteration):
     '''
-        Update the hyperplanes by looking at random moves and selecting the one
-        lowering the most the error.
+        Generates random moves for the hyperplanes.
     '''
     # initialise parameters and directions
     alpha = getAlpha(optimisationIteration)
@@ -144,7 +148,7 @@ def choseUpdateFunction(updateMethod,iteration):
         else:
             return 'varByVar'
 
-def updateHyperplanes(hp,pCentroids,pMeasure,optimisationIteration,lastMSE,updateFunction,distrib,precisionCheck,structureCheck):
+def updateHyperplanes(hp,pCentroids,pMeasure,optimisationIteration,lastMSE,updateFunction,distrib,m,precisionCheck,structureCheck):
     '''
         Actually update the hyperplanes by selecting the lowest MSE between
         several directions. Only uses MSE as measure.
@@ -156,14 +160,18 @@ def updateHyperplanes(hp,pCentroids,pMeasure,optimisationIteration,lastMSE,updat
         directions = directionsVarByVar(hp,10+10*optimisationIteration,optimisationIteration,distrib,pCentroids,structureCheck)
     elif updateFunction == 'indVarByVar':
         directions = directionsIndVarByVar(hp,10+10*optimisationIteration,optimisationIteration)
-    # evaluate MSE
-    directionsMSE = MSEforDirection(directions, pCentroids, pMeasure , distrib)
+    # evaluate distortion
+    if m =='mse':
+        directionsMeasure = ms.MSEforDirection(directions, pCentroids, pMeasure , distrib)
+    elif m == 'entropy':
+        print('il y a un probleme')
     # select the lowest MSE configuration
-    indexMin = np.argmin(directionsMSE)
-    newMSE = measure("mse", directions[indexMin] ,pCentroids ,pMeasure*2 , distrib )
-    return checkPrecision(hp,pCentroids,pMeasure,distrib,directions,precisionCheck,newMSE,lastMSE,indexMin)
+    indexMin = np.argmin(directionsMeasure)
+    newMSE = ms.measure(m, directions[indexMin] ,pCentroids ,pMeasure*2 , distrib )
+    return checkPrecision(hp,pCentroids,pMeasure,optimisationIteration,distrib,m,directions,precisionCheck,newMSE,lastMSE,indexMin)
 
-def checkPrecision(hp,pCentroids,pMeasure,distrib,directions,precisionCheck,newMeasure,lastMeasure,indexMin):
+def checkPrecision(hp,pCentroids,pMeasure,optimisationIteration,distrib,m,directions,precisionCheck,structureCheck,newMeasure,lastMeasure,indexMin):
+    """Deprecated - might not work"""
     if not precisionCheck:
         if newMeasure > lastMeasure :
             print('Error: new Distortion bigger than at previous iteration')
@@ -173,10 +181,17 @@ def checkPrecision(hp,pCentroids,pMeasure,distrib,directions,precisionCheck,newM
             return (directions[indexMin],newMeasure)
     else:
     #check that new configuration is better than the old one, taking imprecision into account
-        variations = getMaxMeasureVariations(hp,pCentroids,pMeasure,distrib)
+        variations = utils.getMaxMeasureVariations(hp,pCentroids,pMeasure,distrib)
         if newMeasure < lastMeasure-variations:
             return directions[indexMin],newMeasure
         else:
             print('Not enough precision - going deeper*******************')
-            newHp,newMeasure = updateHyperplanes(hp,pCentroids,pMeasure*10,optimisationIteration,lastMeasure,updateFunction,distrib)
+            newHp,newMeasure = updateHyperplanes(hp,pCentroids,pMeasure*10,optimisationIteration,lastMeasure,updateFunction,distrib,m,precisionCheck,structureCheck)
             return newHp,newMeasure
+
+
+
+
+
+
+
