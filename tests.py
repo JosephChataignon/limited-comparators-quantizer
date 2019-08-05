@@ -59,31 +59,41 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
         Same as standardTest2D() but runs several times the optimisation.
     '''
     measureEvolutions = []
+    hyperplanesEvolutions = []
     for k in range(numberOfTests):
         #initialisation
         if initNotRandom:
             hp = initNotRandom(nHyperplanes,2,800,2500,20,distribution,m)
         else:
             hp = core.init(nHyperplanes,2)
-        visu.visualiseHyperplanes(hp,'initial configuration',5,distribution)
+        #visu.visualiseHyperplanes(hp,'initial configuration',5,distribution)
     
         #title
         d = 'G' if distrib == 'gaussian' else 'U'
         t = 'test %d%s, model %d'%(nHyperplanes,d,k)
         print(t,'\n')
-    
-        curve,saveHyperplanes = core.optimisation(hp,1000,10000,5,
-            [False,True,5],
+        
+        #optimisation
+        curve,saveHyperplanes = core.optimisation(hp,100,300,3,
+            [False,False,5],
             t,distribution,measure,
             updateMethod="oneVarInterpolation",
             precisionCheck=False,
             structureCheck=False)
         measureEvolutions.append(curve)
+        hyperplanesEvolutions.append(saveHyperplanes)
+    
+    #display results
+    stepsToDisplay = [0,2]
+    for model in hyperplanesEvolutions:
+        for step in stepsToDisplay:
+            visu.visualiseHyperplanes(model[step],'optimisation step %d'%(step),5,distribution)
     plt.figure(); 
     for curve in measureEvolutions:
         plt.plot(curve); 
     plt.title(t); plt.show()
-multipleTest2D(3, distribution, measure, 5)
+    
+multipleTest2D(3, distribution, measure, 3)
     
 
 

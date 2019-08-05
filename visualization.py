@@ -60,3 +60,16 @@ def visualiseHyperplanes(hps,windowTitles,width,distrib,numberPlots=1):
     plt.show()
 # visualiseHyperplanes(init(3,2),'test',10,'uniform')
 
+
+
+
+
+
+
+
+
+
+
+
+
+
