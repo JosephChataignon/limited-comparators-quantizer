@@ -23,7 +23,12 @@ measure = 'entropy'
 
 
 
+
 def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
+    '''
+        With distribution distrib and measure m, run optimisation for 
+        nHyperplanes hyperplanes and 2 dimensions.
+    '''
     #initialisation
     if initNotRandom:
         hp = initNotRandom(nHyperplanes,2,800,2500,20,distribution,m)
@@ -36,16 +41,53 @@ def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
     t = 'test %d%s'%(nHyperplanes,d)
     print(t,'\n')
 
-    curve,saveHyperplanes = core.optimisation(hp,1000,5000,9,
-        [True,True,3],
+    curve,saveHyperplanes = core.optimisation(hp,1000,10000,20,
+        [True,True,5],
         'hps',distribution,measure,
         updateMethod="oneVarInterpolation",
         precisionCheck=False,
         structureCheck=False)
     plt.figure(); plt.plot(curve); plt.title(t); plt.show()
-    print('\nsaveHyperplanes:\n',saveHyperplanes)
-    print('\n',t,'\n')
-standardTest2D(distribution, measure, 3)
+    #print('\nsaveHyperplanes:\n',saveHyperplanes)
+    #print('\n',t,'\n')
+#standardTest2D(distribution, measure, 5)
+
+
+
+def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
+    '''
+        Same as standardTest2D() but runs several times the optimisation.
+    '''
+    measureEvolutions = []
+    for k in range(numberOfTests):
+        #initialisation
+        if initNotRandom:
+            hp = initNotRandom(nHyperplanes,2,800,2500,20,distribution,m)
+        else:
+            hp = core.init(nHyperplanes,2)
+        visu.visualiseHyperplanes(hp,'initial configuration',5,distribution)
+    
+        #title
+        d = 'G' if distrib == 'gaussian' else 'U'
+        t = 'test %d%s, model %d'%(nHyperplanes,d,k)
+        print(t,'\n')
+    
+        curve,saveHyperplanes = core.optimisation(hp,1000,10000,5,
+            [False,True,5],
+            t,distribution,measure,
+            updateMethod="oneVarInterpolation",
+            precisionCheck=False,
+            structureCheck=False)
+        measureEvolutions.append(curve)
+    plt.figure(); 
+    for curve in measureEvolutions:
+        plt.plot(curve); 
+    plt.title(t); plt.show()
+multipleTest2D(3, distribution, measure, 5)
+    
+
+
+
 
 
 def mseEstimations(numberOfEstimations,m="mse"):
