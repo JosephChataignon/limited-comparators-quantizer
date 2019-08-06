@@ -94,8 +94,6 @@ def optimisation(hp,pCentroids,pMeasure,pOptimisation,visualisation=[False,False
     # optimization steps
     for k in range(1,pOptimisation+1):
         
-        if np.all(saveHyperplanes[-1] == hp):
-            print('identical configurations ***')
         print('optimisation function: iteration',k,'of',pOptimisation)
         saveHyperplanes.append(hp)
         

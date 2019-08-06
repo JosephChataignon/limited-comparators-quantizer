@@ -18,7 +18,7 @@ import visualization as visu
 import measures as ms
 
 
-distribution = 'gaussian'
+distribution = 'uniform'
 measure = 'entropy'
 
 
@@ -63,7 +63,7 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
     for k in range(numberOfTests):
         #initialisation
         if initNotRandom:
-            hp = initNotRandom(nHyperplanes,2,800,2500,20,distribution,m)
+            hp = core.initNotRandom(nHyperplanes,2,800,2500,20,distribution,m)
         else:
             hp = core.init(nHyperplanes,2)
         #visu.visualiseHyperplanes(hp,'initial configuration',5,distribution)
@@ -74,7 +74,7 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
         print(t,'\n')
         
         #optimisation
-        curve,saveHyperplanes = core.optimisation(hp,100,300,3,
+        curve,saveHyperplanes = core.optimisation(hp,1000,10000,15,
             [False,False,5],
             t,distribution,measure,
             updateMethod="oneVarInterpolation",
@@ -84,7 +84,7 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
         hyperplanesEvolutions.append(saveHyperplanes)
     
     #display results
-    stepsToDisplay = [0,2]
+    stepsToDisplay = [0,10,-1]
     for model in hyperplanesEvolutions:
         for step in stepsToDisplay:
             visu.visualiseHyperplanes(model[step],'optimisation step %d'%(step),5,distribution)
@@ -92,12 +92,17 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
     for curve in measureEvolutions:
         plt.plot(curve); 
     plt.title(t); plt.show()
-    
-multipleTest2D(3, distribution, measure, 3)
-    
+# multipleTest2D(4, distribution, measure, 5)
 
 
-
+hp = core.init(6,10)
+curve,saveHyperplanes = core.optimisation(hp,1000,5000,10,
+        [False,False,1],
+        'test higher dimensions',distribution,measure,
+        updateMethod="oneVarInterpolation",
+        precisionCheck=False,
+        structureCheck=False)
+plt.figure(); plt.plot(curve); plt.title('higher dimensions'); plt.show()
 
 
 def mseEstimations(numberOfEstimations,m="mse"):
