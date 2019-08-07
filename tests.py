@@ -95,14 +95,26 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
 # multipleTest2D(4, distribution, measure, 5)
 
 
-hp = core.init(6,10)
-curve,saveHyperplanes = core.optimisation(hp,1000,5000,10,
-        [False,False,1],
-        'test higher dimensions',distribution,measure,
-        updateMethod="oneVarInterpolation",
-        precisionCheck=False,
-        structureCheck=False)
-plt.figure(); plt.plot(curve); plt.title('higher dimensions'); plt.show()
+
+
+nHyperplanes = 10
+nDimensions = 8
+nIterations = 10
+def higherDimensions(nHyperplanes,nDimensions,distrib,m,nIterations,initNotRandom=False):
+    #initialisation
+    if initNotRandom:
+        hp = core.initNotRandom(nHyperplanes,nDimensions,800,2500,20,distrib,m)
+    else:
+        hp = core.init(nHyperplanes,nDimensions)
+    
+    curve,saveHyperplanes = core.optimisation(hp,1000,8000,nIterations,
+                                            [False,False,1],
+                                            'test higher dimensions',distribution,measure,
+                                            updateMethod="oneVarInterpolation",
+                                            precisionCheck=False,
+                                            structureCheck=False)
+    # store results in a .csv file
+    
 
 
 def mseEstimations(numberOfEstimations,m="mse"):
