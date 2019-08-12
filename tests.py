@@ -41,8 +41,8 @@ def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
     t = 'test %d%s'%(nHyperplanes,d)
     print(t,'\n')
 
-    curve,saveHyperplanes = core.optimisation(hp,1000,10000,20,
-        [True,True,5],
+    curve,saveHyperplanes = core.optimisation(hp,100,500,6,
+        [True,True,2],
         'hps',distribution,measure,
         updateMethod="oneVarInterpolation",
         precisionCheck=False,
@@ -97,24 +97,36 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
 
 
 
-nHyperplanes = 10
-nDimensions = 8
-nIterations = 10
+nHyperplanes = 5
+nDimensions = 7
+nIterations = 8
+distribution = 'uniform'
+measure = 'entropy'
 def higherDimensions(nHyperplanes,nDimensions,distrib,m,nIterations,initNotRandom=False):
     #initialisation
     if initNotRandom:
-        hp = core.initNotRandom(nHyperplanes,nDimensions,800,2500,20,distrib,m)
+        hp = core.initNotRandom(nHyperplanes,nDimensions,1000,10000,20,distrib,m)
     else:
         hp = core.init(nHyperplanes,nDimensions)
     
-    curve,saveHyperplanes = core.optimisation(hp,1000,8000,nIterations,
+    curve,saveHyperplanes = core.optimisation(hp,5000,20000,nIterations,
                                             [False,False,1],
                                             'test higher dimensions',distribution,measure,
                                             updateMethod="oneVarInterpolation",
                                             precisionCheck=False,
                                             structureCheck=False)
-    # store results in a .csv file
+    # store results in a file
+    d = 'G' if distrib == 'gaussian' else 'U'
+    plt.figure(); plt.plot(curve); plt.title("results_data/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure); plt.show()
+    print("results_data/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure)
     
+    file = open("results_data/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+".txt",'a') 
+    file.write('\n')
+    file.write( str(curve[-1]) )
+    file.close()
+higherDimensions(nHyperplanes,nDimensions,distribution,measure,nIterations)
+
+
 
 
 def mseEstimations(numberOfEstimations,m="mse"):
@@ -130,10 +142,8 @@ def mseEstimations(numberOfEstimations,m="mse"):
 
 
 
-
-
 # possible improvements:
-# change interpolation so as to apply it to each parameter at every iteration - done
+# change interpolation so as to apply it to each parameter at every iteration (to do in optimisation()) instead of 10 times
 # change format of hyperplanes to a 2-coordinates point and and an angle (at least when applying the random changes)
 # change varbyvar update so to chose one hyperplane randomly instead of testing them all
 # particle filters

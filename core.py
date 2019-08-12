@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import copy
 
 import update,utils
 import visualization as visu
@@ -86,7 +87,8 @@ def optimisation(hp,pCentroids,pMeasure,pOptimisation,visualisation=[False,False
             config (hyperplanes intersections, regions) is different from the
             previous one.
     '''
-    measureEvolution = [ms.measure(m,hp,pCentroids,pMeasure,distrib)]; saveHyperplanes = [hp]
+    measureEvolution = [ms.measure(m,hp,pCentroids,pMeasure,distrib)]
+    saveHyperplanes  = [hp]
     
     if visualisation[0]:
         visu.visualiseHyperplanes(hp,wTitle+', iteration= %d, error= %f'%(0,measureEvolution[-1]),5,distrib)
@@ -95,16 +97,17 @@ def optimisation(hp,pCentroids,pMeasure,pOptimisation,visualisation=[False,False
     for k in range(1,pOptimisation+1):
         
         print('optimisation function: iteration',k,'of',pOptimisation)
-        saveHyperplanes.append(hp)
         
         u = update.choseUpdateFunction(updateMethod,k)
         if u == 'oneVarInterpolation':
-            for i in range(10):
-                hp,newMeasure = update.oneVarInterpolation(hp,pCentroids,pMeasure*k,k,
-                                                           measureEvolution[-1],
-                                                           distrib,m,
-                                                           precisionCheck,
-                                                           structureCheck)
+            for i in range(len(hp)):
+                for j in range(len(hp[i])):
+                    hp,newMeasure = update.oneVarInterpolation(hp,pCentroids,pMeasure*k,k,
+                                                               measureEvolution[-1],
+                                                               distrib,m,
+                                                               precisionCheck,
+                                                               structureCheck,
+                                                               var=[i,j])
         elif u == 'indVarByVar':
             for i in range(len(hp)):
                 for j in range(len(hp[i])):
@@ -121,6 +124,7 @@ def optimisation(hp,pCentroids,pMeasure,pOptimisation,visualisation=[False,False
                                                      precisionCheck,
                                                      structureCheck)
         measureEvolution.append(newMeasure)
+        saveHyperplanes.append(copy.deepcopy(hp))
         
         # display result
         if (k % visualisation[2] == 0) and visualisation[1]:

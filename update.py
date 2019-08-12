@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 import numpy as np
-import matplotlib.pyplot as plt
-from scipy import integrate
 from scipy.interpolate import interp1d
 
-import core,utils
-import visualization as visu
+import utils
 import measures as ms
 
 
@@ -35,11 +32,10 @@ def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure
     if var == None:
         i = np.random.random_integers(0,len(hp)-1)
         j = np.random.random_integers(0,len(hp[0])-1)
-        var = hp[i][j]
     else:
         i = var[0]
         j = var[1]
-        var = var[2]
+    var = hp[i][j]
     x = []
     y = []
     for k in [-30.,-20.,-10.,-5.,-2.,-1.5,-1.,-0.75,-0.5,0.01,0.25,0.5,0.75,1.,1.5,2.,3.,6.,10.,20.,30.,40.,50.]:
@@ -52,8 +48,6 @@ def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure
     for k in range(len(x)-3):
         xReduced = x[k:k+4]
         yReduced = y[k:k+4]
-#        print(xReduced)
-#        print(yReduced)
         fApprox = interp1d(xReduced, yReduced, kind='cubic')
         xnew = np.linspace(min(xReduced), max(xReduced), num=100, endpoint=True)
         ynew = fApprox(xnew)
