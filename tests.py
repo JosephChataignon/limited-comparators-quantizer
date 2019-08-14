@@ -97,11 +97,7 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
 
 
 
-nHyperplanes = 5
-nDimensions = 7
-nIterations = 8
-distribution = 'uniform'
-measure = 'entropy'
+
 def higherDimensions(nHyperplanes,nDimensions,distrib,m,nIterations,initNotRandom=False):
     #initialisation
     if initNotRandom:
@@ -124,7 +120,14 @@ def higherDimensions(nHyperplanes,nDimensions,distrib,m,nIterations,initNotRando
     file.write('\n')
     file.write( str(curve[-1]) )
     file.close()
-higherDimensions(nHyperplanes,nDimensions,distribution,measure,nIterations)
+
+while True:
+    for nHyperplanes in range(4,11):
+        nDimensions = 3
+        nIterations = 8
+        distribution = 'uniform'
+        measure = 'entropy'
+        higherDimensions(nHyperplanes,nDimensions,distribution,measure,nIterations)
 
 
 
