@@ -6,8 +6,6 @@ import measures as ms
 
 
 
-
-
 def f(nDimensions,distrib):
     """
         The random distribution for which the quantizer is made.
@@ -38,14 +36,9 @@ def findRegion(x,hyperplanes):
     """
     return np.array([( np.dot( h , np.append(x,1.) ) < 0 ) for h in hyperplanes])
 
-
-
-
 def squareDistance(x,y):
     """Returns the square of the distance between 2 points x and y."""
     return sum((x-y)**2)
-
-
 
 def getExistingRegions(hyperplanes,param,distrib):
     """

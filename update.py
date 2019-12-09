@@ -61,7 +61,7 @@ def oneVarInterpolation(hp,pCentroids,pMeasure,optimisationIteration,lastMeasure
         smallestValuesMeasure.append( ms.measure(m,direction,pCentroids,pMeasure*10,distrib) )
     n = np.argmin( smallestValuesMeasure )
     return smallDirections[n] , smallestValuesMeasure[n]
-    # Visualisation (comment return statement to activate)
+    # Visualisation (comment previous "return" statement to activate)
     # f3 = interp1d(x, y, kind='cubic')
     # xnew = np.linspace(min(x), max(x), num=500, endpoint=True)
     # ynew = f3(xnew)

@@ -26,7 +26,7 @@ def doublePoint(nHyperplanes,nDimensions,distrib):
     """
     hyperplanes = []
     for k in range(nHyperplanes):
-        points = [utils.f(nDimensions,distrib) for n in range(nDimensions)]
+        points = np.array([utils.f(nDimensions,distrib) for n in range(nDimensions)])
         hyperplanes.append( utils.hyperplaneFromPoints(points) )
     return np.array(hyperplanes)
 

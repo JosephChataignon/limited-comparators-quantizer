@@ -12,6 +12,7 @@
 # Note that some regions defined this way may be empty or with an area of zero
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 import core, init
 import visualization as visu
@@ -121,18 +122,19 @@ def higherDimensions(nHyperplanes,nDimensions,distrib,m,nIterations,initNotRando
     file.write( str(curve[-1]) )
     file.close()
 
-while True:
-    for nHyperplanes in range(4,11):
-        nDimensions = 3
-        nIterations = 8
-        distribution = 'uniform'
-        measure = 'entropy'
-        higherDimensions(nHyperplanes,nDimensions,distribution,measure,nIterations)
+#while True:
+#    for nHyperplanes in range(4,11):
+#        nDimensions = 3
+#        nIterations = 8
+#        distribution = 'uniform'
+#        measure = 'entropy'
+#        higherDimensions(nHyperplanes,nDimensions,distribution,measure,nIterations)
 
 
 
 
 def mseEstimations(numberOfEstimations,m="mse"):
+    ''' estimations of MSE on the same set of points to visualise its variance '''
     e=[]
     hp = init.normal(3,2)
     for k in range(numberOfEstimations):
@@ -140,13 +142,24 @@ def mseEstimations(numberOfEstimations,m="mse"):
     plt.figure(); plt.plot(e); plt.title('%d mse estimations')%numberOfEstimations; plt.show()
 # mseEstimations(50)
 
+def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMethod):
+    '''
+        Define the performance of an initialisation method. Run optimization
+        several times to get values about convergence speed, optimum quality...
+        paramEval is the number of times the optimization is to be run.
+    '''
+    measureEvols = []
+    for k in range(paramEval):
+        hps = init.doublePoint(nDimensions,nHyperplanes,distrib) #initialization method can be changed here
+        measureEvolution,saveHyperplanes = core.optimisation(hps,1000,10000,20,distrib,measure,updateMethod)
+        measureEvols.append(measureEvolution)
+        
+        d = 'G' if distrib == 'gaussian' else 'U'
+        file = open("Initialisation_performance_data/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+".txt",'a') 
+        file.write('\n')
+        file.write( str(measureEvolution) )
+        file.close()
 
 
 
 
-
-# possible improvements:
-# change interpolation so as to apply it to each parameter at every iteration (to do in optimisation()) instead of 10 times
-# change format of hyperplanes to a 2-coordinates point and and an angle (at least when applying the random changes)
-# change varbyvar update so to chose one hyperplane randomly instead of testing them all
-# particle filters
