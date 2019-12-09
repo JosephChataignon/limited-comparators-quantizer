@@ -19,6 +19,16 @@ def f(nDimensions,distrib):
     else:
         print('ERROR ! no distribution defined')
 
+def hyperplaneFromPoints(points):
+    '''
+        Returns the hyperplane passing by the set of points "points".
+        points must be a square matrix (n points of dimension n).
+    '''
+    n = points.shape[0]
+    k = np.ones((n,1))
+    a = np.matrix.dot(np.linalg.inv(points), k)
+    a = a.flatten()
+    return np.concatenate((a,[-1.]))
 
 def findRegion(x,hyperplanes):
     """

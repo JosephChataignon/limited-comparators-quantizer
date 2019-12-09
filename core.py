@@ -9,34 +9,6 @@ import measures as ms
 
 
 
-def init(nHyperplanes,nDimensions):
-    """
-        Returns a set of hyperplanes with random orientations. nHyperplanes is
-        the number of hyperplanes to return, and nDimension the number of
-        dimensions of the space.
-    """
-    return np.random.normal(0,10,(nHyperplanes,nDimensions+1))
-
-
-def initNotRandom(nHyperplanes, nDimensions, pCentroids, pMeasure, nConfigs, distrib, m):
-    '''
-        Initialise hyperplanes by generating nConfigs random configurations and
-        selecting the one with lowest measure of distortion.
-    '''
-    for k in range(nConfigs):
-        hp = init(nHyperplanes,nDimensions)
-        e = ms.measure(m,hp,pCentroids,pMeasure,distrib)
-        if k == 0:
-            minDistortion = e
-            minHp = hp
-        else:
-            if minDistortion >= e:
-                minDistortion = e
-                minHp = hp
-    return minHp
-
-
-
 def centroids(hyperplanes,param,distrib):
     """
         Gives the centroid of every non-void region. The returned object is an

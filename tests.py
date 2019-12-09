@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# With n dimensions, each hyperplane P is modelised by an array of length n+1,
+# With n dimensions, each hyperplane P is modeled by an array of length n+1,
 # such that (sum_of P[k]*X[k] for_k<n) + P[n] = 0 for any X in P
 # Each region (ie, intersection of halfspaces defined by the hyperplanes) is
 # modelised by an array of booleans indicating, for each hyperplane, on which
@@ -13,7 +13,7 @@
 
 import matplotlib.pyplot as plt
 
-import core
+import core, init
 import visualization as visu
 import measures as ms
 
@@ -31,9 +31,9 @@ def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
     '''
     #initialisation
     if initNotRandom:
-        hp = initNotRandom(nHyperplanes,2,800,2500,20,distribution,m)
+        hp = init.poolSelect(nHyperplanes,2,800,2500,20,distribution,m)
     else:
-        hp = core.init(nHyperplanes,2)
+        hp = init.normal(nHyperplanes,2)
     visu.visualiseHyperplanes(hp,'initial configuration',5,distribution)
 
     #title
@@ -63,9 +63,9 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
     for k in range(numberOfTests):
         #initialisation
         if initNotRandom:
-            hp = core.initNotRandom(nHyperplanes,2,800,2500,20,distribution,m)
+            hp = init.poolSelect(nHyperplanes,2,800,2500,20,distribution,m)
         else:
-            hp = core.init(nHyperplanes,2)
+            hp = init.normal(nHyperplanes,2)
         #visu.visualiseHyperplanes(hp,'initial configuration',5,distribution)
     
         #title
@@ -101,9 +101,9 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
 def higherDimensions(nHyperplanes,nDimensions,distrib,m,nIterations,initNotRandom=False):
     #initialisation
     if initNotRandom:
-        hp = core.initNotRandom(nHyperplanes,nDimensions,1000,10000,20,distrib,m)
+        hp = init.poolSelect(nHyperplanes,nDimensions,1000,10000,20,distrib,m)
     else:
-        hp = core.init(nHyperplanes,nDimensions)
+        hp = init.normal(nHyperplanes,nDimensions)
     
     curve,saveHyperplanes = core.optimisation(hp,5000,20000,nIterations,
                                             [False,False,1],
@@ -134,7 +134,7 @@ while True:
 
 def mseEstimations(numberOfEstimations,m="mse"):
     e=[]
-    hp = core.init(3,2)
+    hp = init.normal(3,2)
     for k in range(numberOfEstimations):
         e.append(ms.measure(m,hp,1000,10000,'gaussian'))
     plt.figure(); plt.plot(e); plt.title('%d mse estimations')%numberOfEstimations; plt.show()
