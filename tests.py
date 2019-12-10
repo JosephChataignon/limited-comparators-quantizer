@@ -150,16 +150,21 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
     '''
     measureEvols = []
     for k in range(paramEval):
+        
         hps = init.doublePoint(nDimensions,nHyperplanes,distrib) #initialization method can be changed here
-        measureEvolution,saveHyperplanes = core.optimisation(hps,1000,10000,20,distrib,measure,updateMethod)
+        # Don't forget to change the file name accordingly !
+        
+        measureEvolution,saveHyperplanes = core.optimisation(hps,1000,10000,20,distrib=distrib,m=measure,updateMethod=updateMethod)
         measureEvols.append(measureEvolution)
         
         d = 'G' if distrib == 'gaussian' else 'U'
-        file = open("Initialisation_performance_data/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+".txt",'a') 
+        file = open("Initialisation_performance_data/"+"doublePoint_"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+"_update-"+updateMethod+".txt",'a') 
         file.write('\n')
         file.write( str(measureEvolution) )
         file.close()
 
+for k in range(2,6):
+    initPerformance(10,2,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
 
 
 

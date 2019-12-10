@@ -16,6 +16,7 @@ def f(nDimensions,distrib):
         return np.random.uniform(-1. , 1. , nDimensions)
     else:
         print('ERROR ! no distribution defined')
+        distrib[100]
 
 def hyperplaneFromPoints(points):
     '''
