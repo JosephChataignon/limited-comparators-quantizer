@@ -60,7 +60,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
         distribution over the regions.
         Here one hyperplane = one gene. At every iteration, one half of the old
         configs is kept and used to generate the next generation by crossover.
-        -nConfigs is the number of configurations
+        -nConfigs is the number of configurations to generate and cross
         -pGenetic is the number of iterations
         -crossover is the number of crossing points in the crossover operations
         -mutation is the mutation method and intensity
@@ -84,11 +84,12 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
         # Step 2: selecting configs to reproduce
         configs, measures = select(selection, configs, measures)
         # Step 3: crossing configurations
-        configs = cross(crossover, configs)
+        newConfigs = cross(crossover, configs)
+        configs += newConfigs
         # Step 4: mutation
         configs = mutate(mutation, configs)
-    #return
-    #retourner configs
+    # Step 5: return configs
+    return configs
 
 
 
@@ -101,8 +102,10 @@ def select(selection, configs, measures):
     '''
     n = int(len(configs)/2)
     if selection == 'rank':
-        s = sorted(zip(configs,measures))
-        configs,measures = map(list, zip(*s))
+        #s = sorted(zip(measures,configs))
+        #measures,configs = map(list, zip(*s))
+        configs = [x for _,x in sorted(zip(measures,configs))]
+        measures = sorted(measures)
         return configs[:n], measures[:n]
     elif selection == 'random':
         return configs[:n], measures[:n]
@@ -132,6 +135,7 @@ def cross(crossover, configs, outputSize='default'):
                 newConfig.append(configs[j][l])
             if l in crosspoints:
                 useI = not useI
+        newGen.append(newConfig)
     return newGen
 
 def mutate(mutation, configs):
@@ -146,6 +150,7 @@ def mutate(mutation, configs):
     return newConfigs
 
 
-
-
+print(genetic(3, 2, 100, 1000, 'gaussian', 'mse',10, 5, 1, 1))
+#genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
+ #           nConfigs, pGenetic, crossover, mutation, selection='rank', initType='doublePoint'):
 

@@ -70,3 +70,13 @@ def getMaxMeasureVariations(hp,pCentroids,pMeasure,distrib):
     e = np.array(e)
     e = (e - np.mean(e))**2
     return np.sqrt(np.max(e)) * 0.5
+
+def hyperplaneOrder():
+    '''
+        Returns a value that can be used to order hyperplanes by similarity.
+        
+    '''
+    print('not implemented yet')
+
+
+
