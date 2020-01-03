@@ -67,9 +67,10 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
         -selection is the selection method used to chose the configs that are 
             reproduced
     '''
-    # Step 1: generating random configurations
+    print('start initialisation (genetic)')
     configs = []
     measures = []
+    # Step 1: generating random configurations
     for k in range(nConfigs):
         if initType == 'normal':
             config = normal(nHyperplanes,nDimensions) 
@@ -78,9 +79,11 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
         else:
             print("ERROR! invalid initialization type")
         configs.append(config)
-        configPerformance = ms.measure(m, config, pCentroids, pMeasure, distrib)
-        measures.append(configPerformance)
+    print('finished generating random configurations')
+    
     for k in range(pGenetic):
+        print('genetic: iteration '+str(k)+' of '+str(pGenetic))
+        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
         # Step 2: selecting configs to reproduce
         configs, measures = select(selection, configs, measures)
         # Step 3: crossing configurations
@@ -88,9 +91,12 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
         configs += newConfigs
         # Step 4: mutation
         configs = mutate(mutation, configs)
-    # Step 5: return configs
-    return configs
-
+        
+    # Step 5: return the best config
+    measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+    print('end initialisation')
+    return configs[ np.argmin(measures) ]
+#print(genetic(3, 2, 100, 1000, 'gaussian', 'mse',10, 5, 1, 1)) #test
 
 
 
@@ -148,9 +154,4 @@ def mutate(mutation, configs):
         config *= np.random.normal(0,1,np.array(config).shape)
         newConfigs.append(config)
     return newConfigs
-
-
-print(genetic(3, 2, 100, 1000, 'gaussian', 'mse',10, 5, 1, 1))
-#genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
- #           nConfigs, pGenetic, crossover, mutation, selection='rank', initType='doublePoint'):
 
