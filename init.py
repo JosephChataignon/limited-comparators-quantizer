@@ -70,6 +70,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     print('start initialisation (genetic)')
     configs = []
     measures = []
+    geneticMeasureEvolution = []
     # Step 1: generating random configurations
     for k in range(nConfigs):
         if initType == 'normal':
@@ -84,6 +85,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     for k in range(pGenetic):
         print('genetic: iteration '+str(k)+' of '+str(pGenetic))
         measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        geneticMeasureEvolution.append( np.min(measures) )
         # Step 2: selecting configs to reproduce
         configs, measures = select(selection, configs, measures)
         # Step 3: crossing configurations
@@ -95,7 +97,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     # Step 5: return the best config
     measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
     print('end initialisation')
-    return configs[ np.argmin(measures) ]
+    return configs[ np.argmin(measures) ], geneticMeasureEvolution
 #print(genetic(3, 2, 100, 1000, 'gaussian', 'mse',10, 5, 1, 1)) #test
 
 
