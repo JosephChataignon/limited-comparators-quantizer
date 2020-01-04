@@ -70,3 +70,28 @@ def getMaxMeasureVariations(hp,pCentroids,pMeasure,distrib):
     e = np.array(e)
     e = (e - np.mean(e))**2
     return np.sqrt(np.max(e)) * 0.5
+
+def hyperplaneOrder(hp,distrib,orderBy):
+    '''
+        Returns a value that can be used to order hyperplanes by similarity.
+        orderBy is the type of order that is used to order the hyperplanes. 
+        Different ordering methods can be used, giving different results. The 
+        simplest one is the distance of the hyperplane to the coordinate zero.
+    '''
+    if orderBy == "distanceToZero": # distance to the coordinate zero
+        print("not implemented yet")
+    elif orderBy == "distanceToDistribCentroid":# distance to the centroid of the distribution
+        print("not implemented yet")
+
+def normalize(hp):
+    '''
+        normalizes hp such that its last value is 1.0
+    '''
+    print('not implemented yet')
+        
+        
+        
+        
+        
+        
+

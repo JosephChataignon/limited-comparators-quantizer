@@ -151,14 +151,24 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
     measureEvols = []
     for k in range(paramEval):
         
-        hps = init.doublePoint(nDimensions,nHyperplanes,distrib) #initialization method can be changed here
+        # initialization
+        pCentroids = 1000
+        pMeasure = 10000
+        hps = init.genetic(nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,10,5,1,1) #initialization method can be changed here
         # Don't forget to change the file name accordingly !
         
+        # optimize
         measureEvolution,saveHyperplanes = core.optimisation(hps,1000,10000,20,distrib=distrib,m=measure,updateMethod=updateMethod)
         measureEvols.append(measureEvolution)
         
+        # save
         d = 'G' if distrib == 'gaussian' else 'U'
-        file = open("Initialisation_performance_data/"+"doublePoint_"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+"_update-"+updateMethod+".txt",'a') 
+        file = open("Initialisation_performance_data/"
+                    +"genetic_noOrder_"
+                    +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
+                    +"_update-"+updateMethod
+                    +"_10geneticConfigs"+"_5geneticIter"+"_1crossover"
+                    +".txt",'a') 
         file.write('\n')
         file.write( str(measureEvolution) )
         file.close()
