@@ -189,7 +189,7 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
         file.close()
 
 for k in range(2,6): # 2 to 5 hyperplanes
-    initPerformance(10,2,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
+    initPerformance(10,4,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
 
 
 
