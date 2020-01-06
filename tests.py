@@ -152,8 +152,8 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
     for k in range(paramEval):
         
         # initialization
-        pCentroids = 1000
-        pMeasure   = 10000
+        pCentroids = 10000
+        pMeasure   = 100000
         hps , geneticMeasureEvolution = init.genetic(
                 nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
                 10,5,1,1) # configs number, total iterations, crossover points, mutation param
@@ -172,8 +172,10 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
         file.write( str(geneticMeasureEvolution) )
         file.close()
         
+        print('config after genetic algorithm:\n',hps)
+        
         # optimize
-        measureEvolution,saveHyperplanes = core.optimisation(hps,1000,10000,10,distrib=distrib,m=measure,updateMethod=updateMethod)
+        measureEvolution,saveHyperplanes = core.optimisation(hps,1000,10000,5,distrib=distrib,m=measure,updateMethod=updateMethod)
         measureEvols.append(measureEvolution)
         
         # save
@@ -187,9 +189,13 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
         file.write('\n')
         file.write( str(measureEvolution) )
         file.close()
+        
+        print('config after genetic + optimization:\n',saveHyperplanes[-1])
 
-for k in range(3,6): # 2 to 5 hyperplanes
-    initPerformance(1,2,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
+dimensions=4
+for k in range(dimensions,7): # dimensions to 6 hyperplanes
+    initPerformance(1,dimensions,k,distrib='gaussian',
+                    measure='mse',updateMethod='oneVarInterpolation')
 
 
 
