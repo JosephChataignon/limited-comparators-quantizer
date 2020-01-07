@@ -7,16 +7,26 @@ import measures as ms
 
 
 def f(nDimensions,distrib):
-    """
+    '''
         The random distribution for which the quantizer is made.
-    """
+    '''
     if distrib == 'gaussian':
         return np.random.normal(0, 1, nDimensions)
     elif distrib == 'uniform':
         return np.random.uniform(-1. , 1. , nDimensions)
     else:
         print('ERROR ! no distribution defined')
-        distrib[100]
+
+def distribCenter(nDimensions,distrib):
+    '''
+        The center of the random distribution distrib.
+    '''
+    if distrib == 'gaussian':
+        return np.zeros(nDimensions)
+    elif distrib == 'uniform':
+        return np.zeros(nDimensions)
+    else:
+        print('ERROR ! no distribution defined')
 
 def hyperplaneFromPoints(points):
     '''
@@ -83,15 +93,32 @@ def hyperplaneOrder(hp,distrib,orderBy):
     elif orderBy == "distanceToDistribCentroid":# distance to the centroid of the distribution
         print("not implemented yet")
 
-def normalize(hp):
+def normalizeHp(hp):
+    ''' normalizes hp such that its last value is 1. '''
+    hp = np.array(hp)
+    return hp / hp[-1]
+
+def normalizeConfig(config):
+    ''' normalize every hyperplane of config such that its last value is 1. '''
+    return np.array([hp/hp[-1] for hp in config])
+
+def distancePoint2Hp(point, hyperplane):
     '''
-        normalizes hp such that its last value is 1.0
+        Distance between point and hyperplane.
+        d = abs(H.p) / norm(H)
     '''
-    print('not implemented yet')
-        
-        
-        
-        
-        
-        
+    hyperplane = np.array(hyperplane)
+    p1 = np.append(point , 1.)
+    p2 = np.abs( np.dot(p1,hyperplane) )
+    p3 = np.sum( hyperplane[:-1]**2 )
+    return p2/np.sqrt(p3)
+
+
+
+
+
+
+
+
+
 
