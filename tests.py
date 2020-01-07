@@ -154,9 +154,11 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
         # initialization
         pCentroids = 1000
         pMeasure   = 10000
+        order = 'distanceToDistribCenter'
+        #order = None
         hps , geneticMeasureEvolution = init.genetic(
                 nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
-                10,5,1,1) # configs number, total iterations, crossover points, mutation param
+                10,5,1,1,order) # configs number, total iterations, crossover points, mutation param
         # initialization method can be changed here
         # Don't forget to change the file names accordingly !
         

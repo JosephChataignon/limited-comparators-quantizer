@@ -53,7 +53,7 @@ def poolSelect(nHyperplanes, nDimensions, pCentroids, pMeasure, poolSize, distri
     return minConfig
 
 def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
-            nConfigs, pGenetic, crossover, mutation, selection='rank', initType='doublePoint'):
+            nConfigs, pGenetic, crossover, mutation, order=None, selection='rank', initType='doublePoint'):
     '''
         Generates a partially optimized configuration of hyperplanes, with the 
         goal of having an approximatively equal repartition of the input 
@@ -62,6 +62,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
         configs is kept and used to generate the next generation by crossover.
         -nConfigs is the number of configurations to generate and cross
         -pGenetic is the number of iterations
+        -order is the type of ordering used to order hyperplanes before crossover
         -crossover is the number of crossing points in the crossover operations
         -mutation is the mutation method and intensity
         -selection is the selection method used to chose the configs that are 
@@ -89,7 +90,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
         # Step 2: selecting configs to reproduce
         configs, measures = select(selection, configs, measures)
         # Step 3: crossing configurations
-        newConfigs = cross(crossover, configs)
+        newConfigs = cross(nDimensions, distrib, crossover, configs, order)
         configs += newConfigs
         # Step 4: mutation
         configs = mutate(mutation, configs)
@@ -120,14 +121,27 @@ def select(selection, configs, measures):
     else:
         print('ERROR: unknown selection method')
 
-def cross(crossover, configs, outputSize='default'):
+def cross(nDimensions, distrib, crossover, configs, order, outputSize='default'):
     '''
         Crosses the configs 'configs', repeating the operation 'outputSize' times,
         with 'crossover' crossing points each time.
+        Hyperplanes can be ordered before the crossing.
     '''
     newGen = [] # next generation
     if outputSize == 'default':
         outputSize = len(configs)
+    if order:
+        distribCenter = utils.distribCenter(nDimensions, distrib)
+        for k in range(len(configs)):
+            config = configs[k]
+            if order == 'distanceToDistribCenter':
+                ranks = [ utils.distancePoint2Hp(distribCenter,hp) for hp in config ]
+            else:
+                print('ERROR: hyperplanes ordering undefined')
+            #order hyperplanes according to ranks
+            ordConfig = [hp for _,hp in sorted(zip(ranks,config))]
+            configs[k] = ordConfig
+    
     for k in range(outputSize):
         # select 2 configs to cross
         i,j = np.random.randint(len(configs)),np.random.randint(len(configs))
