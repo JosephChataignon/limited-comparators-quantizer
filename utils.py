@@ -93,24 +93,58 @@ def hyperplaneOrder(hp,distrib,orderBy):
     elif orderBy == "distanceToDistribCentroid":# distance to the centroid of the distribution
         print("not implemented yet")
 
-def normalizeHp(hp):
+def normalizeHpNotation(hp):
     ''' normalizes hp such that its last value is 1. '''
     hp = np.array(hp)
     return hp / hp[-1]
 
-def normalizeConfig(config):
+def normalizeConfigNotation(config):
     ''' normalize every hyperplane of config such that its last value is 1. '''
     return np.array([hp/hp[-1] for hp in config])
 
-def distancePoint2Hp(point, hyperplane):
+def norm1(hp):
+    '''Norm 1 of hp'''
+    return hp / np.sqrt(np.sum(hp**2))
+
+def angleHps(hp1,hp2):
+    '''returns the angle between 2 hyperplanes (need to normalize them first)'''
+    return np.abs(np.arccos(np.dot(hp1,hp2)))
+
+def nearestPoint(point, hp):
+    '''returns the point of hp that is nearest to point'''
+    p1 = np.append(point , 1.)
+    p2 = np.dot(p1,hp)
+    p3 = np.sum( hp[:-1]**2 )
+    l = -p2/p3
+    return point + l * hp[:-1]
+
+def distanceBetweenHps(hp1, hp2, distrib):
+    '''
+        Measure the distance between 2 hyperplanes as the distance of their 
+        points nearest to the distribution center
+    '''
+    point1 = nearestPoint( distribCenter( len(hp1)-1 , distrib ) , hp1 )
+    point2 = nearestPoint( distribCenter( len(hp2)-1 , distrib ) , hp2 )
+    return np.sqrt(squareDistance(point1,point2))
+
+def dissimilarityHps(hp1, hp2, distrib):
+    '''
+        Measure the dissimilarity between 2 hyperplanes as the distance of their 
+        points nearest to the distribution center, multiplied with their angle.
+    '''
+    angle = angleHps(norm1(hp1),norm1(hp2))
+    distance = distanceBetweenHps(hp1,hp2,distrib)
+    return angle * distance
+
+def distancePoint2Hp(point, hp):
     '''
         Distance between point and hyperplane.
         d = abs(H.p) / norm(H)
     '''
-    hyperplane = np.array(hyperplane)
+    hp = np.array(hp)
     p1 = np.append(point , 1.)
-    p2 = np.abs( np.dot(p1,hyperplane) )
-    p3 = np.sum( hyperplane[:-1]**2 )
+    p2 = np.abs( np.dot(p1,hp) )
+    p3 = np.sum( hp[:-1]**2 )
     return p2/np.sqrt(p3)
 
 
