@@ -72,7 +72,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     configs = []
     measures = []
     geneticMeasureEvolution = []
-    # Step 1: generating random configurations
+    # Step 1: generate random configurations
     for k in range(nConfigs):
         if initType == 'normal':
             config = normal(nHyperplanes,nDimensions) 
@@ -130,33 +130,39 @@ def cross(nDimensions, distrib, crossover, configs, order, outputSize='default')
     newGen = [] # next generation
     if outputSize == 'default':
         outputSize = len(configs)
-    if order:
+    if order == 'distanceToDistribCenter':
         distribCenter = utils.distribCenter(nDimensions, distrib)
         for k in range(len(configs)):
             config = configs[k]
-            if order == 'distanceToDistribCenter':
-                ranks = [ utils.distancePoint2Hp(distribCenter,hp) for hp in config ]
-            else:
-                print('ERROR: hyperplanes ordering undefined')
+            ranks = [ utils.distancePoint2Hp(distribCenter,hp) for hp in config ]
             #order hyperplanes according to ranks
             ordConfig = [hp for _,hp in sorted(zip(ranks,config))]
-            configs[k] = ordConfig
+            configs[k] = ordConfig        
     
     for k in range(outputSize):
         # select 2 configs to cross
         i,j = np.random.randint(len(configs)),np.random.randint(len(configs))
-        # chose crossing points
-        crosspoints = np.random.randint(len(configs[0]), size=crossover)
-        # cross
-        newConfig = []
-        useI = True # whether to include i or j genes
-        for l in range(len(configs[0])):
-            if useI:
-                newConfig.append(configs[i][l])
-            else:
-                newConfig.append(configs[j][l])
-            if l in crosspoints:
-                useI = not useI
+        if order == 'distanceToDistribCenter':
+            crosspoints = np.random.randint(len(configs[0]), size=crossover)# chose crossing points
+            newConfig = []
+            useI = True # whether to include i or j genes
+            for l in range(len(configs[0])):
+                if useI:
+                    newConfig.append(configs[i][l])
+                else:
+                    newConfig.append(configs[j][l])
+                if l in crosspoints:
+                    useI = not useI
+        elif order == 'dissimilarity':
+            dissimilarities, hpPairs = [], [] # list to store dissimilarity values and associated hyperplane pairs
+            for k in range(1,len(configs[i])):
+                for l in range(k+1):
+                    dissimilarities.append(utils.dissimilarityHps(configs[j][l], configs[i][k], distrib))
+                    hpPairs.append([k,l])
+            hpPairs = [hpPair for _,hpPair in sorted(zip(dissimilarities,hpPairs))]
+            newConfig = configs[i]
+            for pair in hpPairs[:int(len(hpPairs)/2)]: #swap the most similar half of hyperplane pairs
+                newConfig[pair[0]] = configs[j][pair[1]]
         newGen.append(newConfig)
     return newGen
 
