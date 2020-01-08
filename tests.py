@@ -194,7 +194,7 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
         
         print('config after genetic + optimization:\n',saveHyperplanes[-1])
 
-dimensions=4
+dimensions=2
 for k in range(dimensions,7): # dimensions to 6 hyperplanes
     initPerformance(1,dimensions,k,distrib='gaussian',
                     measure='mse',updateMethod='oneVarInterpolation')
