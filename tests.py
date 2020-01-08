@@ -152,7 +152,7 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
     for k in range(paramEval):
         
         # initialization
-        order = 'distanceToDistribCenter'
+        order = 'dissimilarity'
         #order = None
         pCentroids = 10000
         pMeasure   = 100000
@@ -165,7 +165,7 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
         # save genetic algorithm results
         d = 'G' if distrib == 'gaussian' else 'U'
         file = open("Initialisation_performance_data/genetic_evol_data/"
-                    +"genetic_orderDistancetoCenter_"
+                    +"genetic_dissimilarity_"
                     +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
                     +"_update-"+updateMethod
                     +"_10geneticConfigs"+"_5geneticIter"+"_1crossover"
