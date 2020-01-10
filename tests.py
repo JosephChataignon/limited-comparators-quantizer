@@ -142,62 +142,78 @@ def mseEstimations(numberOfEstimations,m="mse"):
     plt.figure(); plt.plot(e); plt.title('%d mse estimations')%numberOfEstimations; plt.show()
 # mseEstimations(50)
 
-def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMethod):
+def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMethod,geneticInit=False):
     '''
         Define the performance of an initialisation method. Run optimization
         several times to get values about convergence speed, optimum quality...
         paramEval is the number of times the optimization is to be run.
     '''
     measureEvols = []
+    typeInit = "genetic_"
     for k in range(paramEval):
         
         # initialization
-        order = 'dissimilarity'
-        #order = None
-        pCentroids = 10000
-        pMeasure   = 100000
-        hps , geneticMeasureEvolution = init.genetic(
-                nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
-                10,5,1,1,order) # configs number, total iterations, crossover points, mutation param
-        # initialization method can be changed here
-        # Don't forget to change the file names accordingly !
-        
-        # save genetic algorithm results
-        d = 'G' if distrib == 'gaussian' else 'U'
-        file = open("Initialisation_performance_data/genetic_evol_data/"
-                    +"genetic_dissimilarity_"
-                    +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
-                    +"_update-"+updateMethod
-                    +"_10geneticConfigs"+"_5geneticIter"+"_1crossover"
-                    +".txt",'a') 
-        file.write('\n')
-        file.write( str(geneticMeasureEvolution) )
-        file.close()
-        
-        print('config after genetic algorithm:\n',hps)
+        if geneticInit:
+            order = 'dissimilarity'
+            pCentroids = 10000
+            pMeasure   = 30000
+            hps , geneticMeasureEvolution = init.genetic(
+                    nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
+                    10,5,1,1,order) # configs number, total iterations, crossover points, mutation param
+            # initialization method can be changed here
+            # Don't forget to change the file names accordingly !
+            
+            # save genetic algorithm results
+            d = 'G' if distrib == 'gaussian' else 'U'
+            file = open("Initialisation_performance_data/genetic_evol_data/"
+                        +"genetic_"
+                        +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
+                        +"_10geneticConfigs"+"_5geneticIter"+"_1crossover"
+                        +".txt",'a') 
+            file.write('\n')
+            file.write( str(geneticMeasureEvolution) )
+            file.close()
+        else:
+            typeInit,hps = "randomInit_",[]
+            hps = init.doublePoint(nHyperplanes,nDimensions,distrib)
         
         # optimize
-        measureEvolution,saveHyperplanes = core.optimisation(hps,1000,10000,5,distrib=distrib,m=measure,updateMethod=updateMethod)
+        pCentroids = 10000
+        pMeasure   = 100000
+        measureEvolution,saveHyperplanes = core.optimisation(hps,pCentroids,pMeasure,
+                                                             5,distrib=distrib,m=measure,
+                                                             updateMethod=updateMethod)
         measureEvols.append(measureEvolution)
         
         # save
         d = 'G' if distrib == 'gaussian' else 'U'
         file = open("Initialisation_performance_data/"
-                    +"genetic_noOrder_"
+                    +typeInit
                     +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
-                    +"_update-"+updateMethod
                     +"_10geneticConfigs"+"_5geneticIter"+"_1crossover"
                     +".txt",'a') 
         file.write('\n')
         file.write( str(measureEvolution) )
         file.close()
-        
-        print('config after genetic + optimization:\n',saveHyperplanes[-1])
+
+#dimensions=2
+#for k in range(dimensions,7): # dimensions to 6 hyperplanes
+#    initPerformance(1,dimensions,k,distrib='gaussian',
+#                    measure='mse',updateMethod='oneVarInterpolation')
+
+
+
 
 dimensions=2
-for k in range(dimensions,7): # dimensions to 6 hyperplanes
-    initPerformance(1,dimensions,k,distrib='gaussian',
-                    measure='mse',updateMethod='oneVarInterpolation')
+#dimensions=3
+#dimensions=4
+#dimensions=5
+for k in range(dimensions,7):
+    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
+#    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
+
+
+
 
 
 

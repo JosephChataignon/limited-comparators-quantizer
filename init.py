@@ -85,16 +85,19 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     
     for k in range(pGenetic):
         print('genetic: iteration '+str(k)+' of '+str(pGenetic))
-        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]        
         geneticMeasureEvolution.append( np.min(measures) )
         # Step 2: selecting configs to reproduce
         configs, measures = select(selection, configs, measures)
+        
         # Step 3: crossing configurations
         newConfigs = cross(nDimensions, distrib, crossover, configs, order)
-        configs += newConfigs
+        configs = np.concatenate((configs,newConfigs),axis=0)
+        
         # Step 4: mutation
         configs = mutate(mutation, configs)
-        
+        pMeasure *=2
+    
     # Step 5: return the best config
     measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
     print('end initialisation')
@@ -111,8 +114,7 @@ def select(selection, configs, measures):
     '''
     n = int(len(configs)/2)
     if selection == 'rank':
-        #s = sorted(zip(measures,configs))
-        #measures,configs = map(list, zip(*s))
+        # sort by distortion measure and keep the lowest
         configs = [x for _,x in sorted(zip(measures,configs))]
         measures = sorted(measures)
         return configs[:n], measures[:n]
@@ -142,7 +144,7 @@ def cross(nDimensions, distrib, crossover, configs, order, outputSize='default')
     for k in range(outputSize):
         # select 2 configs to cross
         i,j = np.random.randint(len(configs)),np.random.randint(len(configs))
-        if order == 'distanceToDistribCenter':
+        if order == 'distanceToDistribCenter' or order == 'noOrder':
             crosspoints = np.random.randint(len(configs[0]), size=crossover)# chose crossing points
             newConfig = []
             useI = True # whether to include i or j genes
@@ -173,7 +175,7 @@ def mutate(mutation, configs):
     '''
     newConfigs = []
     for config in configs:
-        config *= np.random.normal(0,1,np.array(config).shape)
+        config *= np.random.normal(1,0.1,np.array(config).shape)
         newConfigs.append(config)
     return newConfigs
 
