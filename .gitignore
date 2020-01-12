@@ -2,5 +2,11 @@
 .spyproject
 affichage figures.py
 __pycache__/
-__pycache__/*pyc
-
+__pycache__/*.pyc
+*.pyc
+__pycache__/core.cpython-37.pyc
+__pycache__/init.cpython-37.pyc
+__pycache__/measures.cpython-37.pyc
+__pycache__/update.cpython-37.pyc
+__pycache__/utils.cpython-37.pyc
+__pycache__/visualization.cpython-37.pyc

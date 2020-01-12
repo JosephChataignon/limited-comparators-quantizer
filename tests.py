@@ -155,8 +155,8 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
         # initialization
         if geneticInit:
             order = 'dissimilarity'
-            pCentroids = 10
-            pMeasure   = 3
+            pCentroids = 10000
+            pMeasure   = 30000
             hps , geneticMeasureEvolution = init.genetic(
                     nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
                     10,5,1,1,order) # configs number, total iterations, crossover points, mutation param
@@ -178,8 +178,8 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
             hps = init.doublePoint(nHyperplanes,nDimensions,distrib)
         
         # optimize
-        pCentroids = 10
-        pMeasure   = 100
+        pCentroids = 10000
+        pMeasure   = 100000
         measureEvolution,saveHyperplanes = core.optimisation(hps,pCentroids,pMeasure,
                                                              5,distrib=distrib,m=measure,
                                                              updateMethod=updateMethod)
@@ -204,13 +204,13 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
 
 
 
-dimensions=2
+#dimensions=2
 #dimensions=3
 #dimensions=4
-#dimensions=5
+dimensions=5
 for k in range(dimensions,7):
-#    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
-    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
+    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
+#    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
 
 
 
