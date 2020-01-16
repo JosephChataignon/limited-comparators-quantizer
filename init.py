@@ -84,22 +84,42 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     print('finished generating random configurations')
     
     for k in range(pGenetic):
-        print('genetic: iteration '+str(k)+' of '+str(pGenetic))
-        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]        
+        print('genetic: iteration '+str(k+1)+' of '+str(pGenetic))
+        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        
+        print('1: ',np.min(measures))
+        
         geneticMeasureEvolution.append( np.min(measures) )
         # Step 2: selecting configs to reproduce
         configs, measures = select(selection, configs, measures)
         
+        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        print('2: ',np.min(measures))
+        
         # Step 3: crossing configurations
         newConfigs = cross(nDimensions, distrib, crossover, configs, order)
-        configs = np.concatenate((configs,newConfigs),axis=0)
+        
+        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        print('9: ',np.min(measures))
+        
+        #configs = np.concatenate((configs,newConfigs),axis=0)
+        configs = np.array([c for c in configs]+[c for c in newConfigs])
+        
+        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        print('3: ',np.min(measures))
         
         # Step 4: mutation
         configs = mutate(mutation, configs)
         pMeasure *=2
+        
+        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        print('4: ',np.min(measures))
     
     # Step 5: return the best config
     measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+    
+    print('final: ',np.min(measures))
+    
     print('end initialisation')
     return configs[ np.argmin(measures) ], geneticMeasureEvolution
 #print(genetic(3, 2, 100, 1000, 'gaussian', 'mse',10, 5, 1, 1)) #test
@@ -158,7 +178,7 @@ def cross(nDimensions, distrib, crossover, configs, order, outputSize='default')
         elif order == 'dissimilarity':
             dissimilarities, hpPairs = [], [] # list to store dissimilarity values and associated hyperplane pairs
             for k in range(1,len(configs[i])):
-                for l in range(k+1):
+                for l in range(k):
                     dissimilarities.append(utils.dissimilarityHps(configs[j][l], configs[i][k], distrib))
                     hpPairs.append([k,l])
             hpPairs = [hpPair for _,hpPair in sorted(zip(dissimilarities,hpPairs))]

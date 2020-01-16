@@ -204,13 +204,13 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
 
 
 
-#dimensions=2
+dimensions=2
 #dimensions=3
 #dimensions=4
-dimensions=5
+#dimensions=5
 for k in range(dimensions,7):
-    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
-#    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
+#    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
+    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
 
 
 
