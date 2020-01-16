@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import numpy as np
+import copy
 
 import utils
 import measures as ms
@@ -53,7 +54,8 @@ def poolSelect(nHyperplanes, nDimensions, pCentroids, pMeasure, poolSize, distri
     return minConfig
 
 def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
-            nConfigs, pGenetic, crossover, mutation, order=None, selection='rank', initType='doublePoint'):
+            nConfigs, pGenetic, crossover, mutation, order='dissimilarity', selection='rank', 
+            initType='doublePoint'):
     '''
         Generates a partially optimized configuration of hyperplanes, with the 
         goal of having an approximatively equal repartition of the input 
@@ -97,23 +99,23 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
         print('2: ',np.min(measures))
         
         # Step 3: crossing configurations
-        newConfigs = cross(nDimensions, distrib, crossover, configs, order)
-        
-        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
-        print('9: ',np.min(measures))
-        
-        #configs = np.concatenate((configs,newConfigs),axis=0)
-        configs = np.array([c for c in configs]+[c for c in newConfigs])
+        newConfigs = cross(nDimensions, distrib, crossover, copy.deepcopy(configs), order)#problem happens here !!!
         
         measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
         print('3: ',np.min(measures))
         
-        # Step 4: mutation
-        configs = mutate(mutation, configs)
-        pMeasure *=2
+        configs = np.concatenate((configs,newConfigs),axis=0)
+        #configs = np.array([c for c in configs]+[c for c in newConfigs])
         
         measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
         print('4: ',np.min(measures))
+        
+        # Step 4: mutation
+        configs = mutate(mutation, configs, measures)
+        pMeasure *=2
+        
+        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        print('5: ',np.min(measures))
     
     # Step 5: return the best config
     measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
@@ -122,7 +124,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     
     print('end initialisation')
     return configs[ np.argmin(measures) ], geneticMeasureEvolution
-#print(genetic(3, 2, 100, 1000, 'gaussian', 'mse',10, 5, 1, 1)) #test
+print(genetic(3, 2, 1000, 10000, 'gaussian', 'mse',10, 5, 1, 1)) #test
 
 
 
@@ -188,14 +190,17 @@ def cross(nDimensions, distrib, crossover, configs, order, outputSize='default')
         newGen.append(newConfig)
     return newGen
 
-def mutate(mutation, configs):
+def mutate(mutation, configs, measures):
     '''
         Applies a random mutation to configs. For now, only multiplies every 
         matrix coefficient with a random normal value.
     '''
-    newConfigs = []
-    for config in configs:
-        config *= np.random.normal(1,0.1,np.array(config).shape)
-        newConfigs.append(config)
-    return newConfigs
-
+    #newConfigs = []#muter uniquement les moins performants
+    configs = [x for _,x in sorted(zip(measures,configs))]
+    nHp,nDim1,nC = len(configs[0]), len(configs[0][0]), int(len(configs)/2)
+    
+    configs *= np.concatenate(( np.ones(( nC,nHp,nDim1 )) ,
+            np.random.normal(1,0.1, (len(configs)-nC,nHp,nDim1) )
+            ), axis=0 )
+    
+    return configs
