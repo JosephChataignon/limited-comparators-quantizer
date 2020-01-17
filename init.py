@@ -124,7 +124,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     
     print('end initialisation')
     return configs[ np.argmin(measures) ], geneticMeasureEvolution
-print(genetic(3, 2, 1000, 10000, 'gaussian', 'mse',10, 5, 1, 1)) #test
+#print(genetic(3, 2, 1000, 10000, 'gaussian', 'mse',10, 5, 1, 1)) #test
 
 
 

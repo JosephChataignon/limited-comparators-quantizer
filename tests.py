@@ -209,8 +209,8 @@ dimensions=2
 #dimensions=4
 #dimensions=5
 for k in range(dimensions,7):
-    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
-    #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
+    #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
+    initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
 
 
 
