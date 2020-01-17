@@ -83,7 +83,7 @@ def maxlloyd(germs,iterations,pCentroids,pMeasure,distrib):
         estimating the centroid of a region.
     '''
     nRegions, nDimensions = len(germs), len(germs[0]) # number of regions and dimensions
-    print("LBG algorithm, ",nRegions," regions, ",nDimensions," dimensions.")
+    print("LBG algorithm with",nRegions,"regions and",nDimensions,"dimensions.")
     regions = adjustRegions(germs)
     measureEvolution = [MSE(regions,germs,pMeasure, distrib)]
     savegerms=[germs]
@@ -93,14 +93,14 @@ def maxlloyd(germs,iterations,pCentroids,pMeasure,distrib):
         regions = adjustRegions(germs)
         # Step 2: adjust germs
         germs = centroids(regions, pCentroids, distrib)
-        savegerms.append(germs)
         # measure distortion
         measureEvolution.append(MSE(regions,germs,pMeasure, distrib))
+        pMeasure = int(np.sqrt(2)*pMeasure)
     print("LBG finished")
     return measureEvolution,germs,regions
 
-germs = initLBG(7,2,'gaussian')
-measureEvolution,germs,regions = maxlloyd(germs,5,10000,100000,'gaussian')
+#germs = initLBG(7,2,'gaussian')
+#measureEvolution,germs,regions = maxlloyd(germs,5,10000,100000,'gaussian')
 
 def displayregions(griddimensions,regions):
     '''visualizes the regions, in 2D only, for a number of regions <= 8'''

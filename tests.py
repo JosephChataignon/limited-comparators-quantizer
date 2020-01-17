@@ -14,7 +14,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import core, init
+import core, init, LBG
 import visualization as visu
 import measures as ms
 
@@ -29,6 +29,7 @@ def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
     '''
         With distribution distrib and measure m, run optimisation for 
         nHyperplanes hyperplanes and 2 dimensions.
+        Plots a figure of the evolution of distortion.
     '''
     #initialisation
     if initNotRandom:
@@ -201,7 +202,7 @@ def initPerformance(paramEval,nDimensions,nHyperplanes,distrib,measure,updateMet
 #    initPerformance(1,dimensions,k,distrib='gaussian',
 #                    measure='mse',updateMethod='oneVarInterpolation')
 
-def runGenetic(nHyperplanes,nDimensions,distrib,measure,):
+def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     order = 'dissimilarity'
     pCentroids = 10000
     pMeasure   = 30000
@@ -222,6 +223,23 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure,):
     file.write( str(geneticMeasureEvolution) )
     file.close()
 
+def testLBG(nRegions,nDimensions, distrib,measure,iterations):
+    
+    pCentroids = 10000
+    pMeasure   = 30000
+    germs = LBG.initLBG(nRegions,nDimensions,'gaussian')
+    measureEvolution,germs,regions = LBG.maxlloyd(germs,iterations,pCentroids,pMeasure,'gaussian')
+    d = 'G' if distrib == 'gaussian' else 'U'
+    file = open("LBGdata/"
+                +d+"_"+str(nDimensions)+"D_"+str(nRegions)+"Reg_"+measure+"_"
+                +str(iterations)+"iter"
+                +".txt",'a') 
+    file.write('\n')
+    file.write( str(measureEvolution) )
+    file.close()
+
+
+
 repeats = 5
 
 dimensions=2
@@ -232,9 +250,8 @@ for r in range(repeats):
     for k in range(dimensions,7):
         #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
         #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
-        runGenetic(k,dimensions,'gaussian','mse')
-
-
+        #runGenetic(k,dimensions,'gaussian','mse')
+        testLBG(k,dimensions,'gaussian','mse',10)
 
 
 
