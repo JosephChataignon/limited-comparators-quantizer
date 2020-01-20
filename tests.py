@@ -240,18 +240,18 @@ def testLBG(nRegions,nDimensions, distrib,measure,iterations):
 
 
 
-repeats = 5
+repeats = 45
 
 dimensions=2
 #dimensions=3
 #dimensions=4
 #dimensions=5
 for r in range(repeats):
-    for k in range(dimensions,7):
+    for k in range(dimensions,8):
         #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
         #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
-        #runGenetic(k,dimensions,'gaussian','mse')
-        testLBG(k,dimensions,'gaussian','mse',10)
+        runGenetic(k,dimensions,'gaussian','mse')
+        #testLBG(k,dimensions,'gaussian','mse',10)
 
 
 
