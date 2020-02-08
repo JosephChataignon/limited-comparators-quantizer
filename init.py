@@ -53,7 +53,7 @@ def poolSelect(nHyperplanes, nDimensions, pCentroids, pMeasure, poolSize, distri
                 minConfig = hps
     return minConfig
 
-def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
+def genetic(nHyperplanes, nDimensions, pCentroids, pMeasureInit, distrib, m,
             nConfigs, pGenetic, crossover, mutation, order='dissimilarity', selection='rank', 
             initType='doublePoint'):
     '''
@@ -86,36 +86,18 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
     print('finished generating random configurations')
     
     for k in range(pGenetic):
+        pMeasure = (k+1)*pMeasureInit
         print('genetic: iteration '+str(k+1)+' of '+str(pGenetic))
         measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
-        
-        print('1: ',np.min(measures))
-        
         geneticMeasureEvolution.append( np.min(measures) )
         # Step 2: selecting configs to reproduce
-        configs, measures = select(selection, configs, measures)
-        
-        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
-        print('2: ',np.min(measures))
-        
+        configs, measures = select(selection, configs, measures, percentageToKeep=80)
         # Step 3: crossing configurations
-        newConfigs = cross(nDimensions, distrib, crossover, copy.deepcopy(configs), order)#problem happens here !!!
-        
-        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
-        print('3: ',np.min(measures))
-        
+        newConfigs = cross(nDimensions, distrib, crossover, copy.deepcopy(configs), order, outputsize=nConfigs)
         configs = np.concatenate((configs,newConfigs),axis=0)
-        #configs = np.array([c for c in configs]+[c for c in newConfigs])
-        
         measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
-        print('4: ',np.min(measures))
-        
         # Step 4: mutation
         configs = mutate(mutation, configs, measures)
-        pMeasure *=2
-        
-        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
-        print('5: ',np.min(measures))
     
     # Step 5: return the best config
     measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
@@ -130,18 +112,21 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasure, distrib, m,
 
 ## Genetic algorithm subfunctions
 
-def select(selection, configs, measures):
+def select(selection, configs, measures, percentageToKeep=50):
     '''
-        Returns the selected configurations that are kept for the next generation.
+        Returns the selected configurations that are kept for the next 
+        generation.
+        percentageToKeep is the persentage of the total of configuration, 
+        representing the configurations that will be kept.
     '''
-    n = int(len(configs)/2)
+    n = int(len(configs)*percentageToKeep/100)
     if selection == 'rank':
         # sort by distortion measure and keep the lowest
         configs = [x for _,x in sorted(zip(measures,configs))]
         measures = sorted(measures)
-        return configs[:n], measures[:n]
+        return configs[:n+1], measures[:n+1]
     elif selection == 'random':
-        return configs[:n], measures[:n]
+        return configs[:n+1], measures[:n+1]
     else:
         print('ERROR: unknown selection method')
 
@@ -200,7 +185,7 @@ def mutate(mutation, configs, measures):
     nHp,nDim1,nC = len(configs[0]), len(configs[0][0]), int(len(configs)/2)
     
     configs *= np.concatenate(( np.ones(( nC,nHp,nDim1 )) ,
-            np.random.normal(1,0.1, (len(configs)-nC,nHp,nDim1) )
+            np.random.normal(1,0.2, (len(configs)-nC,nHp,nDim1) )
             ), axis=0 )
     
     return configs

@@ -208,13 +208,13 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     pMeasure   = 30000
     hps , geneticMeasureEvolution = init.genetic(
             nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
-            10,5,1,1,order) # configs number, total iterations, crossover points, mutation param
+            10,30,1,1,order) # configs number, total iterations, crossover points, mutation param
     # initialization method can be changed here
     # Don't forget to change the file names accordingly !
     
     # save genetic algorithm results
     d = 'G' if distrib == 'gaussian' else 'U'
-    file = open("Initialisation_performance_data/genetic_evol_data/"
+    file = open("Initialisation_performance_data/genetic_evol_30Iter/"
                 +"genetic_"
                 +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
                 +"_10geneticConfigs"+"_5geneticIter"+"_1crossover"
