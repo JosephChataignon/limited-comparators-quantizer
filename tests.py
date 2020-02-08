@@ -206,9 +206,10 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     order = 'dissimilarity'
     pCentroids = 10000
     pMeasure   = 30000
+    genIter = 30 #iterations of the genetic algorithm
     hps , geneticMeasureEvolution = init.genetic(
             nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
-            10,30,1,1,order) # configs number, total iterations, crossover points, mutation param
+            10,genIter,1,1,order) # configs number, total iterations, crossover points, mutation param
     # initialization method can be changed here
     # Don't forget to change the file names accordingly !
     
@@ -217,7 +218,7 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     file = open("Initialisation_performance_data/genetic_evol_30Iter/"
                 +"genetic_"
                 +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
-                +"_10geneticConfigs"+"_5geneticIter"+"_1crossover"
+                +"_10geneticConfigs"+"_"+str(genIter)+"geneticIter"+"_1crossover"
                 +".txt",'a') 
     file.write('\n')
     file.write( str(geneticMeasureEvolution) )
@@ -240,7 +241,7 @@ def testLBG(nRegions,nDimensions, distrib,measure,iterations):
 
 
 
-repeats = 45
+repeats = 25
 
 dimensions=2
 #dimensions=3

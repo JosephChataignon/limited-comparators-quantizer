@@ -93,7 +93,7 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasureInit, distrib, m,
         # Step 2: selecting configs to reproduce
         configs, measures = select(selection, configs, measures, percentageToKeep=80)
         # Step 3: crossing configurations
-        newConfigs = cross(nDimensions, distrib, crossover, copy.deepcopy(configs), order, outputsize=nConfigs)
+        newConfigs = cross(nDimensions, distrib, crossover, copy.deepcopy(configs), order, outputSize=nConfigs)
         configs = np.concatenate((configs,newConfigs),axis=0)
         measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
         # Step 4: mutation
