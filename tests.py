@@ -215,7 +215,7 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     
     # save genetic algorithm results
     d = 'G' if distrib == 'gaussian' else 'U'
-    file = open("Initialisation_performance_data/genetic_evol_30Iter/"
+    file = open("Initialisation_performance_data/genetic_evol_data_30Iter/"
                 +"genetic_"
                 +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
                 +"_10geneticConfigs"+"_"+str(genIter)+"geneticIter"+"_1crossover"
@@ -243,10 +243,10 @@ def testLBG(nRegions,nDimensions, distrib,measure,iterations):
 
 repeats = 25
 
-dimensions=2
+#dimensions=2
 #dimensions=3
 #dimensions=4
-#dimensions=5
+dimensions=5
 for r in range(repeats):
     for k in range(dimensions,8):
         #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
