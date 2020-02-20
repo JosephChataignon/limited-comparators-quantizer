@@ -55,7 +55,7 @@ def poolSelect(nHyperplanes, nDimensions, pCentroids, pMeasure, poolSize, distri
 
 def genetic(nHyperplanes, nDimensions, pCentroids, pMeasureInit, distrib, m,
             nConfigs, pGenetic, crossover, mutation, order='dissimilarity', selection='rank', 
-            initType='doublePoint'):
+            initType='doublePoint', mutationPercentage=50):
     '''
         Generates a partially optimized configuration of hyperplanes, with the 
         goal of having an approximatively equal repartition of the input 
@@ -95,9 +95,13 @@ def genetic(nHyperplanes, nDimensions, pCentroids, pMeasureInit, distrib, m,
         # Step 3: crossing configurations
         newConfigs = cross(nDimensions, distrib, crossover, copy.deepcopy(configs), order, outputSize=nConfigs)
         configs = np.concatenate((configs,newConfigs),axis=0)
-        measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+        
         # Step 4: mutation
-        configs = mutate(mutation, configs, measures)
+        if mutationPercentage == 100:
+            configs = mutateAll(mutation,configs)
+        else:
+            measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
+            configs = mutate(mutation, configs, measures, mutationPercentage)
     
     # Step 5: return the best config
     measures = [ms.measure(m, config, pCentroids, pMeasure, distrib) for config in configs]
@@ -175,17 +179,23 @@ def cross(nDimensions, distrib, crossover, configs, order, outputSize='default')
         newGen.append(newConfig)
     return newGen
 
-def mutate(mutation, configs, measures):
+def mutateAll(mutation, configs):
+    '''Applies a random mutation to all configs'''
+    configs *= np.random.normal(1.,0.2, np.shape(configs))
+    return configs
+
+def mutate(mutation, configs, measures, percentageToMutate=50):
     '''
-        Applies a random mutation to configs. For now, only multiplies every 
-        matrix coefficient with a random normal value.
+        Applies a random mutation to a ceratin percentage of configs. For now,
+        only multiplies every matrix coefficient with a random normal value.
     '''
     #newConfigs = []#muter uniquement les moins performants
-    configs = [x for _,x in sorted(zip(measures,configs))]
-    nHp,nDim1,nC = len(configs[0]), len(configs[0][0]), int(len(configs)/2)
+    configs = [x for _,x in sorted(zip(measures,configs))] # Sort configs according to measure
+    nHp,nDim1,nC = len(configs[0]), len(configs[0][0]), int(len(configs)/100*percentageToMutate)
     
-    configs *= np.concatenate(( np.ones(( nC,nHp,nDim1 )) ,
-            np.random.normal(1,0.2, (len(configs)-nC,nHp,nDim1) )
-            ), axis=0 )
+    configs *= np.concatenate((
+        np.ones(( nC,nHp,nDim1 )) ,
+        np.random.normal(1.,0.2, (len(configs)-nC,nHp,nDim1) )
+        ),axis=0)
     
     return configs
