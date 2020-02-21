@@ -100,14 +100,15 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
 
 
 
-def higherDimensions(nHyperplanes,nDimensions,distrib,m,nIterations,initNotRandom=False):
+def testOpti(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,nIterations,initMethod='doublePoint'):
+    '''Execute optimization function'''
     #initialisation
-    if initNotRandom:
-        hp = init.poolSelect(nHyperplanes,nDimensions,1000,10000,20,distrib,m)
+    if initMethod == 'doublePoint':
+        hp = init.doublePoint(nHyperplanes, nDimensions, distrib)
     else:
-        hp = init.normal(nHyperplanes,nDimensions)
+        print('need to code other init methods')
     
-    curve,saveHyperplanes = core.optimisation(hp,5000,20000,nIterations,
+    measureEvol,saveHyperplanes = core.optimisation(hp,pCentroids,pMeasure,nIterations,
                                             [False,False,1],
                                             'test higher dimensions',distribution,measure,
                                             updateMethod="oneVarInterpolation",
@@ -115,21 +116,10 @@ def higherDimensions(nHyperplanes,nDimensions,distrib,m,nIterations,initNotRando
                                             structureCheck=False)
     # store results in a file
     d = 'G' if distrib == 'gaussian' else 'U'
-    plt.figure(); plt.plot(curve); plt.title("results_data/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure); plt.show()
-    print("results_data/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure)
-    
-    file = open("results_data/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+".txt",'a') 
+    file = open("optidata/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+"_"+nIterations+"iter"+".txt",'a') 
     file.write('\n')
-    file.write( str(curve[-1]) )
+    file.write( str(measureEvol) )
     file.close()
-
-#while True:
-#    for nHyperplanes in range(4,11):
-#        nDimensions = 3
-#        nIterations = 8
-#        distribution = 'uniform'
-#        measure = 'entropy'
-#        higherDimensions(nHyperplanes,nDimensions,distribution,measure,nIterations)
 
 
 
@@ -248,11 +238,12 @@ repeats = 25
 #dimensions=4
 dimensions=5
 for r in range(repeats):
-    for k in range(dimensions,8):
+    #for k in range(dimensions,8):
         #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
         #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
-        runGenetic(k,dimensions,'gaussian','mse')
+        #runGenetic(k,dimensions,'gaussian','mse')
         #testLBG(k,dimensions,'gaussian','mse',10)
-
+    for k in range(7,dimensions-1,-1):
+        testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
 
 
