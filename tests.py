@@ -116,7 +116,7 @@ def testOpti(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,nIterations,
                                             structureCheck=False)
     # store results in a file
     d = 'G' if distrib == 'gaussian' else 'U'
-    file = open("optidata/"+d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+"_"+nIterations+"iter"+".txt",'a') 
+    file = open("optidata/"+str(d)+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+"_"+str(nIterations)+"iter"+".txt",'a') 
     file.write('\n')
     file.write( str(measureEvol) )
     file.close()
@@ -233,9 +233,9 @@ def testLBG(nRegions,nDimensions, distrib,measure,iterations):
 
 repeats = 25
 
-#dimensions=2
-#dimensions=3
-#dimensions=4
+dimensions=2
+dimensions=3
+dimensions=4
 dimensions=5
 for r in range(repeats):
     #for k in range(dimensions,8):
