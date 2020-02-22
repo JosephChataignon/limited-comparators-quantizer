@@ -19,11 +19,6 @@ import visualization as visu
 import measures as ms
 
 
-distribution = 'uniform'
-measure = 'entropy'
-
-
-
 
 def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
     '''
@@ -33,10 +28,10 @@ def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
     '''
     #initialisation
     if initNotRandom:
-        hp = init.poolSelect(nHyperplanes,2,800,2500,20,distribution,m)
+        hp = init.poolSelect(nHyperplanes,2,800,2500,20,distrib,m)
     else:
         hp = init.normal(nHyperplanes,2)
-    visu.visualiseHyperplanes(hp,'initial configuration',5,distribution)
+    visu.visualiseHyperplanes(hp,'initial configuration',5,distrib)
 
     #title
     d = 'G' if distrib == 'gaussian' else 'U'
@@ -45,7 +40,7 @@ def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
 
     curve,saveHyperplanes = core.optimisation(hp,100,500,6,
         [True,True,2],
-        'hps',distribution,measure,
+        'hps',distrib,m,
         updateMethod="oneVarInterpolation",
         precisionCheck=False,
         structureCheck=False)
@@ -65,7 +60,7 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
     for k in range(numberOfTests):
         #initialisation
         if initNotRandom:
-            hp = init.poolSelect(nHyperplanes,2,800,2500,20,distribution,m)
+            hp = init.poolSelect(nHyperplanes,2,800,2500,20,distrib,m)
         else:
             hp = init.normal(nHyperplanes,2)
         #visu.visualiseHyperplanes(hp,'initial configuration',5,distribution)
@@ -78,7 +73,7 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
         #optimisation
         curve,saveHyperplanes = core.optimisation(hp,1000,10000,15,
             [False,False,5],
-            t,distribution,measure,
+            t,distrib,m,
             updateMethod="oneVarInterpolation",
             precisionCheck=False,
             structureCheck=False)
@@ -89,7 +84,7 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
     stepsToDisplay = [0,10,-1]
     for model in hyperplanesEvolutions:
         for step in stepsToDisplay:
-            visu.visualiseHyperplanes(model[step],'optimisation step %d'%(step),5,distribution)
+            visu.visualiseHyperplanes(model[step],'optimisation step %d'%(step),5,distrib)
     plt.figure(); 
     for curve in measureEvolutions:
         plt.plot(curve); 
@@ -110,13 +105,13 @@ def testOpti(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,nIterations,
     
     measureEvol,saveHyperplanes = core.optimisation(hp,pCentroids,pMeasure,nIterations,
                                             [False,False,1],
-                                            'test higher dimensions',distribution,measure,
+                                            'test higher dimensions',distrib,m,
                                             updateMethod="oneVarInterpolation",
                                             precisionCheck=False,
                                             structureCheck=False)
     # store results in a file
     d = 'G' if distrib == 'gaussian' else 'U'
-    file = open("optidata/"+str(d)+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure+"_"+str(nIterations)+"iter"+".txt",'a') 
+    file = open("optidata/"+str(d)+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+m+"_"+str(nIterations)+"iter"+".txt",'a') 
     file.write('\n')
     file.write( str(measureEvol) )
     file.close()
@@ -234,9 +229,9 @@ def testLBG(nRegions,nDimensions, distrib,measure,iterations):
 repeats = 25
 
 dimensions=2
-dimensions=3
-dimensions=4
-dimensions=5
+#dimensions=3
+#dimensions=4
+#dimensions=5
 for r in range(repeats):
     #for k in range(dimensions,8):
         #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
