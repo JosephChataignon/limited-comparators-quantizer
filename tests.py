@@ -134,7 +134,7 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     pCentroids = 10000
     pMeasure   = 30000
     genIter = 30 #iterations of the genetic algorithm
-    nConfigs = 10
+    nConfigs = 100
     
     hps , geneticMeasureEvolution = init.genetic(
             nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
@@ -170,18 +170,12 @@ def testLBG(nRegions,nDimensions, distrib,measure,iterations):
 
 
 repeats = 25
-
-dimensions=2
-#dimensions=3
-#dimensions=4
-#dimensions=5
+#dimension from 2 to 5
+dimensions=3
 for r in range(repeats):
-    #for k in range(dimensions,8):
-        #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation')
-        #initPerformance(1,dimensions,k,distrib='gaussian',measure='mse',updateMethod='oneVarInterpolation',geneticInit=True)
-        #runGenetic(k,dimensions,'gaussian','mse')
-        #testLBG(k,dimensions,'gaussian','mse',10)
-    for k in range(7,dimensions-1,-1):
-        testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
-
+    # for k in range(dimensions,8):
+    #     runGenetic(k,dimensions,'gaussian','mse')
+    #     testLBG(k,dimensions,'gaussian','mse',10)
+    #     testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
+    runGenetic(7, dimensions, 'gaussian', 'mse')#7hp in 3D
 
