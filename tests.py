@@ -146,7 +146,7 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     file = open("Initialisation_performance_data/genetic_evol_data_"+str(genIter)+"Iter/"
                 +"genetic_"
                 +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
-                +"_10geneticConfigs"+"_"+str(genIter)+"geneticIter"+"_1crossover"
+                +"_"+nConfigs+"geneticConfigs"+"_"+str(genIter)+"geneticIter"+"_1crossover"
                 +".txt",'a') 
     file.write('\n')
     file.write( str(geneticMeasureEvolution) )
