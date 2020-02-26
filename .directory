@@ -2,5 +2,8 @@
 Icon=folder-green
 
 [Dolphin]
-Timestamp=2020,2,21,9,51,48
+Timestamp=2020,2,25,20,54,26
 Version=4
+
+[Settings]
+HiddenFilesShown=true

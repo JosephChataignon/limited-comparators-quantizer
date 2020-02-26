@@ -176,6 +176,11 @@ def cross(nDimensions, distrib, crossover, configs, order, outputSize='default')
             newConfig = configs[i]
             for pair in hpPairs[:int(len(hpPairs)/2)]: #swap the most similar half of hyperplane pairs
                 newConfig[pair[0]] = configs[j][pair[1]]
+        elif order == 'completeRandom':
+            newConfig = [] 
+            for l in range(len(configs[0])):
+                nextHp = configs[i][l] if np.random.uniform() > 0.5 else configs[j][l]
+                newConfig.append(nextHp)
         newGen.append(newConfig)
     return newGen
 
@@ -189,7 +194,7 @@ def mutate(mutation, configs, measures, percentageToMutate=50):
         Applies a random mutation to a ceratin percentage of configs. For now,
         only multiplies every matrix coefficient with a random normal value.
     '''
-    #newConfigs = []#muter uniquement les moins performants
+    #newConfigs = [] #mutate only the worst configs
     configs = [x for _,x in sorted(zip(measures,configs))] # Sort configs according to measure
     nHp,nDim1,nC = len(configs[0]), len(configs[0][0]), int(len(configs)/100*percentageToMutate)
     

@@ -130,11 +130,11 @@ def mseEstimations(numberOfEstimations,m="mse"):
 
 
 def runGenetic(nHyperplanes,nDimensions,distrib,measure):
-    order = 'dissimilarity'
+    order = 'completeRandom'
     pCentroids = 10000
     pMeasure   = 30000
     genIter = 30 #iterations of the genetic algorithm
-    nConfigs = 100
+    nConfigs = 10
     
     hps , geneticMeasureEvolution = init.genetic(
             nHyperplanes,nDimensions, pCentroids, pMeasure,distrib,measure,
@@ -146,7 +146,7 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     file = open("Initialisation_performance_data/genetic_evol_data_"+str(genIter)+"Iter/"
                 +"genetic_"
                 +d+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+measure
-                +"_10geneticConfigs"+"_"+str(genIter)+"geneticIter"+"_1crossover"
+                +"_10geneticConfigs"+"_"+str(genIter)+"geneticIter"+"_completeRandom"
                 +".txt",'a') 
     file.write('\n')
     file.write( str(geneticMeasureEvolution) )
@@ -173,9 +173,8 @@ repeats = 25
 #dimension from 2 to 5
 dimensions=3
 for r in range(repeats):
-    # for k in range(dimensions,8):
-    #     runGenetic(k,dimensions,'gaussian','mse')
+    for k in range(dimensions,8):
+        runGenetic(k,dimensions,'gaussian','mse')
     #     testLBG(k,dimensions,'gaussian','mse',10)
     #     testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
-    runGenetic(7, dimensions, 'gaussian', 'mse')#7hp in 3D
 
