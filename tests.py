@@ -171,7 +171,7 @@ def testLBG(nRegions,nDimensions, distrib,measure,iterations):
 
 repeats = 25
 #dimension from 2 to 5
-dimensions=3
+dimensions=7
 for r in range(repeats):
     for k in range(dimensions,8):
         runGenetic(k,dimensions,'gaussian','mse')
