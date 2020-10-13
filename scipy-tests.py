@@ -61,8 +61,8 @@ repeats = 25
 dimensions=3
 for r in range(repeats):
     for k in range(dimensions,8):
-        
+        pass
     #    runGenetic(k,dimensions,'gaussian','mse')
     #     testLBG(k,dimensions,'gaussian','mse',10)
     #     testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
-
+    
