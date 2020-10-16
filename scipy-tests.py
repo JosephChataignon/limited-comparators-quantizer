@@ -33,6 +33,7 @@ def S_callback(xk):
 
 def test_scipy(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,initMethod='doublePoint'):
     global measureEvol
+    global scipy_method
     measureEvol = []
     if initMethod == 'doublePoint':
         hp = init.doublePoint(nHyperplanes, nDimensions, distrib)
@@ -41,9 +42,9 @@ def test_scipy(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,initMethod
     x0 = hp.flatten() #convert to a 1-D vector    
     result = minimize( S_measure, x0, 
         args=(nHyperplanes,nDimensions,m,pCentroids,pMeasure,distrib), 
-        method='Nelder-Mead',
+        method=scipy_method,
         callback=S_callback,
-        options={'maxiter':10000}
+        options={'maxiter':1000}
     )
     
     
@@ -58,14 +59,22 @@ def test_scipy(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,initMethod
 measureEvol = [] # Needs to be declared here so that it can be used module-wide
 
 
+# scipy_method should be in {'SLSQP', 'CG', 'COBYLA', 'BFGS', 'Powell', 'Nelder-Mead', 'TNC', 'L-BFGS-B'}
+scipy_method = 'SLSQP'
 
 repeats = 20
 #dimension from 2 to 5
-dimensions=3
-for r in range(repeats):
-    for k in range(dimensions,8):
-    #    runGenetic(k,dimensions,'gaussian','mse')
-    #    testLBG(k,dimensions,'gaussian','mse',10)
-    #    testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
-        test_scipy(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',initMethod='doublePoint')
-    
+for dimensions in range(2,6):
+    for r in range(repeats):
+        for k in range(dimensions,8):
+            test_scipy(k,dimensions,
+                        distrib='gaussian',
+                        pCentroids=1000,
+                        pMeasure=10000,
+                        m='mse',
+                        initMethod='doublePoint'
+                      )
+
+
+
+
