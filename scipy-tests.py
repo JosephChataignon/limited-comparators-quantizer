@@ -34,6 +34,7 @@ def S_callback(xk):
 def test_scipy(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,initMethod='doublePoint'):
     global measureEvol
     global scipy_method
+    global scipy_options
     measureEvol = []
     if initMethod == 'doublePoint':
         hp = init.doublePoint(nHyperplanes, nDimensions, distrib)
@@ -50,7 +51,7 @@ def test_scipy(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,initMethod
     
     # store results in a file
     d = 'G' if distrib == 'gaussian' else 'U'
-    file = open("scipydata/"+str(d)+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+m+".txt",'a')
+    file = open("scipydata/"+str(d)+"_"+str(nDimensions)+"D_"+str(nHyperplanes)+"Hp_"+scipy_method+'_'+m+".txt",'a')
     file.write('\n')
     file.write( str(measureEvol) )
     file.close()
@@ -59,8 +60,13 @@ def test_scipy(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,initMethod
 measureEvol = [] # Needs to be declared here so that it can be used module-wide
 
 
+
+options_opti = {'SLSQP':{'ftol':0.001}, 'CG':{'gtol':0.0005}, 'COBYLA':None, 
+                'BFGS':{'gtol':0.0005}, 'Powell':{'ftol':0.001},
+                'Nelder-Mead': {'xatol':0.001}, 'TNC':{'gtol':0.0005}, 'L-BFGS-B':{'gtol':0.0005}}
 # scipy_method should be in {'SLSQP', 'CG', 'COBYLA', 'BFGS', 'Powell', 'Nelder-Mead', 'TNC', 'L-BFGS-B'}
 scipy_method = 'SLSQP'
+scipy_options = options_opti[scipy_method]
 
 repeats = 20
 #dimension from 2 to 5
@@ -70,7 +76,7 @@ for dimensions in range(2,6):
             test_scipy(k,dimensions,
                         distrib='gaussian',
                         pCentroids=1000,
-                        pMeasure=10000,
+                        pMeasure=50000,
                         m='mse',
                         initMethod='doublePoint'
                       )
