@@ -65,7 +65,7 @@ options_opti = {'SLSQP':{'ftol':0.001}, 'CG':{'gtol':0.0005}, 'COBYLA':None,
                 'BFGS':{'gtol':0.0005}, 'Powell':{'ftol':0.001},
                 'Nelder-Mead': {'xatol':0.001}, 'TNC':{'gtol':0.0005}, 'L-BFGS-B':{'gtol':0.0005}}
 # scipy_method should be in {'SLSQP', 'CG', 'COBYLA', 'BFGS', 'Powell', 'Nelder-Mead', 'TNC', 'L-BFGS-B'}
-scipy_method = 'SLSQP'
+scipy_method = 'L-BFGS-B'
 scipy_options = options_opti[scipy_method]
 
 repeats = 20
