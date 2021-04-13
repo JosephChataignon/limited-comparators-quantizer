@@ -6,7 +6,7 @@ import measures as ms
 
 
 
-def f(nDimensions,distrib):
+def f(nDimensions,distrib,dataset=None):
     '''
         The random distribution for which the quantizer is made.
     '''
@@ -14,8 +14,26 @@ def f(nDimensions,distrib):
         return np.random.normal(0, 1, nDimensions)
     elif distrib == 'uniform':
         return np.random.uniform(-1. , 1. , nDimensions)
+    elif distrib == 'dataset':
+        return next(dataset)
     else:
-        print('ERROR ! no distribution defined')
+        print('ERROR ! no distribution defined')    
+
+def load_dataset(filename='dataset/noaa-daily-weather-data-ajaccio.csv',loop=False):
+    '''
+        loads the full dataset at once
+        loop = True makes the generator loop back to the beginning of the file
+        NOAA dataset is from:
+        https://data.opendatasoft.com/explore/dataset/noaa-daily-weather-data%40public/information/?q=&refine.country_code=FR&refine.name=AJACCIO
+        TODO: normalize data ?
+    '''
+    with open(filename,'r') as f:
+        line = f.readline()
+        while True:
+            line = f.readline().strip().split(',')
+            yield [float(x)+0.5 for x in line[1:]] # shift values to avoid zeros
+            if not loop: break
+
 
 def distribCenter(nDimensions,distrib):
     '''

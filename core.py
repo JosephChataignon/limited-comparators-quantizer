@@ -9,7 +9,7 @@ import measures as ms
 
 
 
-def centroids(hyperplanes,param,distrib):
+def centroids(hyperplanes,param,distrib,dataset=None):
     """
         Gives the centroid of every non-void region. The returned object is an
         array containing every non-void regions with the coordinates of its
@@ -21,7 +21,7 @@ def centroids(hyperplanes,param,distrib):
     output = []
     rpr = [] # realisations per region
     for i in range(param):
-        x = utils.f(len(hyperplanes[0])-1 , distrib)
+        x = utils.f(len(hyperplanes[0])-1 , distrib, dataset)
         r = utils.findRegion(x,hyperplanes)
         ir = -1 # index of r in the array output
         for j in range(len(output)): # check if r is already registered

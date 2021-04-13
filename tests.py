@@ -20,7 +20,7 @@ import measures as ms
 
 
 
-def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
+def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False,dataset=None):
     '''
         With distribution distrib and measure m, run optimisation for 
         nHyperplanes hyperplanes and 2 dimensions.
@@ -51,7 +51,7 @@ def standardTest2D(distrib,m,nHyperplanes,initNotRandom=False):
 
 
 
-def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
+def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False,dataset=None):
     '''
         Same as standardTest2D() but runs several times the optimisation.
     '''
@@ -95,7 +95,7 @@ def multipleTest2D(numberOfTests,distrib,m,nHyperplanes,initNotRandom=False):
 
 
 
-def testOpti(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,nIterations,initMethod='doublePoint'):
+def testOpti(nHyperplanes,nDimensions,distrib,pCentroids,pMeasure,m,nIterations,initMethod='doublePoint',dataset=None):
     '''Execute optimization function'''
     #initialisation
     if initMethod == 'doublePoint':
@@ -129,7 +129,7 @@ def mseEstimations(numberOfEstimations,m="mse"):
 # mseEstimations(50)
 
 
-def runGenetic(nHyperplanes,nDimensions,distrib,measure):
+def runGenetic(nHyperplanes,nDimensions,distrib,measure,dataset=None):
     order = 'completeRandom'
     pCentroids = 10000
     pMeasure   = 30000
@@ -152,13 +152,13 @@ def runGenetic(nHyperplanes,nDimensions,distrib,measure):
     file.write( str(geneticMeasureEvolution) )
     file.close()
 
-def testLBG(nRegions,nDimensions, distrib,measure,iterations):
+def testLBG(nRegions,nDimensions,distrib,measure,iterations,dataset=None):
     
     pCentroids = 10000
     pMeasure   = 30000
-    germs = LBG.initLBG(nRegions,nDimensions,'gaussian')
-    measureEvolution,germs,regions = LBG.maxlloyd(germs,iterations,pCentroids,pMeasure,'gaussian')
-    d = 'G' if distrib == 'gaussian' else 'U'
+    germs = LBG.initLBG(nRegions,nDimensions,distrib,dataset)
+    measureEvolution,germs,regions = LBG.maxlloyd(germs,iterations,pCentroids,pMeasure,'gaussian',dataset)
+    d = distrib[0].upper() # G for gaussian, U for uniform, D for dataset
     file = open("LBGdata/"
                 +d+"_"+str(nDimensions)+"D_"+str(nRegions)+"Reg_"+measure+"_"
                 +str(iterations)+"iter"
@@ -171,10 +171,10 @@ def testLBG(nRegions,nDimensions, distrib,measure,iterations):
 
 repeats = 25
 #dimension from 2 to 5
-dimensions=7
+dimensions=3
 for r in range(repeats):
     for k in range(dimensions,8):
-        runGenetic(k,dimensions,'gaussian','mse')
+    #     runGenetic(k,dimensions,'gaussian','mse')
     #     testLBG(k,dimensions,'gaussian','mse',10)
     #     testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
-
+        testLBG(k,3,'dataset','mse',10)

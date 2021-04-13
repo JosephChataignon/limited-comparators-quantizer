@@ -8,17 +8,17 @@ import core,utils
 
 
 
-def measure(m,hyperplanes,pCentroids,pMeasure,distrib):
+def measure(m,hyperplanes,pCentroids,pMeasure,distrib, dataset):
     if m == "mse":
-        return MSE(hyperplanes,pCentroids,pMeasure,distrib)
+        return MSE(hyperplanes,pCentroids,pMeasure,distrib, dataset)
     elif m == "entropy":
-        return negEntropy(hyperplanes,pCentroids,pMeasure,distrib)
+        return negEntropy(hyperplanes,pCentroids,pMeasure,distrib, dataset)
     else:
         print("Error: the measure parameter is unknown")
 
 
 
-def negEntropy(hyperplanes,pCentroids,pMeasure,distrib):
+def negEntropy(hyperplanes,pCentroids,pMeasure,distrib, dataset):
     """
         Returns the opposite (negative) of the overall entropy of the
         hyperplane configuration inducted by the parameter hyperplanes.
@@ -33,7 +33,7 @@ def negEntropy(hyperplanes,pCentroids,pMeasure,distrib):
     for i in range(pMeasure):
         
         # generate point and find its region
-        x = utils.f(len(hyperplanes[0])-1 , distrib)
+        x = utils.f(len(hyperplanes[0])-1 , distrib, dataset)
         r = utils.findRegion(x,hyperplanes)
         
         # match region with an already known one
@@ -57,7 +57,7 @@ def negEntropy(hyperplanes,pCentroids,pMeasure,distrib):
 
 
 
-def MSE(hyperplanes,pCentroids,pMeasure,distrib):
+def MSE(hyperplanes,pCentroids,pMeasure,distrib, dataset):
     """
         Returns MSE given the hyperplanes separating regions.
         Parameter pCentroids is the number of realisations of f used for
@@ -68,7 +68,7 @@ def MSE(hyperplanes,pCentroids,pMeasure,distrib):
     numberOfPointsUsed = 0
     regionsWithCentroids = core.centroids(hyperplanes,pCentroids,distrib)
     for i in range(pMeasure):
-        x = utils.f(len(hyperplanes[0])-1 , distrib)
+        x = utils.f(len(hyperplanes[0])-1 , distrib, dataset)
         r = utils.findRegion(x,hyperplanes)
         regionRegistered = False
         for j in range(len(regionsWithCentroids)):
@@ -83,7 +83,7 @@ def MSE(hyperplanes,pCentroids,pMeasure,distrib):
     error /= float(numberOfPointsUsed)
     return error
 
-def MSEforDirection(directions, pCentroids, pMeasure, distrib):
+def MSEforDirection(directions, pCentroids, pMeasure, distrib, dataset):
     """
         A more efficient way to compute MSE for different directions (for a
         specific update function)
@@ -96,7 +96,7 @@ def MSEforDirection(directions, pCentroids, pMeasure, distrib):
         regionsWithCentroids.append(core.centroids(dir,pCentroids,distrib) )
     # calculate error
     for k in range(pMeasure):
-        x = utils.f(len(directions[0][0])-1 , distrib) # pick a random point x
+        x = utils.f(len(directions[0][0])-1 , distrib, dataset) # pick a random point x
         for i in range(len(directions)): #for each direction i
             r = utils.findRegion(x,directions[i])
             regionRegistered = False
