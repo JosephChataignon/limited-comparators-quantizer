@@ -9,8 +9,7 @@ def initLBG(nRegions,nDimensions,distrib,dataset):
     elif distrib == 'uniform':
         return np.random.uniform(size=(nRegions,nDimensions))
     elif distrib == 'dataset':
-        ds = utils.load_dataset(loop=True)
-        return np.array([next(ds) for x in range(nRegions)])
+        return np.array([next(dataset) for x in range(nRegions)])
     else:
         print('ERROR: no distribution defined')
 
@@ -79,7 +78,7 @@ def adjustRegions(germs):
                     regions[i,j,:] = regions[i,j,:] / np.abs(regions[i,j,-1])
     return regions
 
-def maxlloyd(germs,iterations,pCentroids,pMeasure,distrib,dataset):
+def maxlloyd(germs,iterations,pCentroids,pMeasure,distrib,dataset=None):
     '''
         Actual implementation of Max-Lloyd algorithm.
         griddimensions indicates the number of points on each axis that are used for

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
+import random
 
 import measures as ms
 
@@ -19,20 +20,27 @@ def f(nDimensions,distrib,dataset=None):
     else:
         print('ERROR ! no distribution defined')    
 
-def load_dataset(filename='dataset/noaa-daily-weather-data-ajaccio.csv',loop=False):
+def load_dataset(filename='dataset/noaa-daily-weather-data.csv',
+                 dimension=3,loop=False):
     '''
         loads the full dataset at once
         loop = True makes the generator loop back to the beginning of the file
         NOAA dataset is from:
-        https://data.opendatasoft.com/explore/dataset/noaa-daily-weather-data%40public/information/?q=&refine.country_code=FR&refine.name=AJACCIO
-        TODO: normalize data ?
+        https://data.opendatasoft.com/explore/dataset/noaa-daily-weather-data%40public/information/?q=&refine.country_code=FR
     '''
     with open(filename,'r') as f:
-        line = f.readline()
-        while True:
-            line = f.readline().strip().split(',')
-            yield [float(x)+0.5 for x in line[1:]] # shift values to avoid zeros
-            if not loop: break
+        lines = f.readlines()
+    while True:
+        c, datapoint = 0, []
+        random.shuffle(lines)
+        while len(datapoint) < dimension:
+            try:
+                datapoint.append(float(lines[c].strip()))
+            except ValueError: pass
+            c += 1
+        yield datapoint
+        if c >= len(lines)-dimension: continue
+            
 
 
 def distribCenter(nDimensions,distrib):

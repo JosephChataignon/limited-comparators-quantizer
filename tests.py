@@ -14,7 +14,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-import core, init, LBG
+import core, init, LBG, utils
 import visualization as visu
 import measures as ms
 
@@ -168,13 +168,16 @@ def testLBG(nRegions,nDimensions,distrib,measure,iterations,dataset=None):
     file.close()
 
 
-
+dataset = utils.load_dataset(loop=True)
 repeats = 25
 #dimension from 2 to 5
 dimensions=3
 for r in range(repeats):
     for k in range(dimensions,8):
-    #     runGenetic(k,dimensions,'gaussian','mse')
-    #     testLBG(k,dimensions,'gaussian','mse',10)
-    #     testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
-        testLBG(k,3,'dataset','mse',10)
+#        runGenetic(k,dimensions,'gaussian','mse')
+#        testLBG(k,dimensions,'gaussian','mse',10)
+#        testOpti(k,dimensions,distrib='gaussian',pCentroids=1000,pMeasure=10000,m='mse',nIterations=3)
+        ## dataset tests
+        ds = utils.load_dataset(dimension=dimensions,loop=True)
+        testLBG(k,dimensions,'dataset','mse',10, ds)
+#        testOpti(k,3,distrib='dataset',pCentroids=30,pMeasure=300,m='mse',nIterations=3)
